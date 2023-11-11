@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "129890247419",
+    "firebase_url": "https://remember-96779-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "remember-96779",
+    "storage_bucket": "remember-96779.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:129890247419:android:b852c3d688298a7996065e",
+        "android_client_info": {
+          "package_name": "com.gmail.remember"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "129890247419-2qnrm9ghsu35vlqo2vprglf435dd4to3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gmail.remember",
+            "certificate_hash": "5252831bc3ee58e1d434f8746daafaa1efbfb5f9"
+          }
+        },
+        {
+          "client_id": "129890247419-vqtj82crrjsb04k34f3qh636i8q1h220.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKqmjjcQIb1vni3iNZMJdmyBX4wlciNiM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "129890247419-vqtj82crrjsb04k34f3qh636i8q1h220.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

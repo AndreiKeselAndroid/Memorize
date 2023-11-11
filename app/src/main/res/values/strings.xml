@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">Memorize</string>
+    <string name="app_name">Запоминалка</string>
+    <string name="settings">Настройки</string>
+    <string name="add">Добавить слова</string>
+    <string name="loading">Загрузка</string>
+    <string name="sign">Войти</string>
+    <string name="exit">Выйти</string>
 </resources>
