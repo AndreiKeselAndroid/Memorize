@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Remember" parent="android:Theme.Material.NoActionBar" />
+
+    <style name="Theme.Remember" parent="android:Theme.Material.NoActionBar">
+        <item name="android:background">#FF000000</item>
+    </style>
 
     <style name="Theme.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#FF000000</item>
         <item name="postSplashScreenTheme">@style/Theme.Remember</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
     </style>
+
 </resources>

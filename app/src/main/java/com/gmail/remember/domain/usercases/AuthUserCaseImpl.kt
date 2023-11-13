@@ -2,6 +2,7 @@ package com.gmail.remember.domain.usercases
 
 import androidx.core.app.ComponentActivity
 import com.gmail.remember.data.RememberRepository
+import com.gmail.remember.models.ProfileModel
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
@@ -13,8 +14,8 @@ internal class AuthUserCaseImpl @Inject constructor(
     private val rememberRepository: RememberRepository
 ) : AuthUserCase {
 
-    override val token: Flow<String?>
-        get() = rememberRepository.token
+    override val profile: Flow<ProfileModel>
+        get() = rememberRepository.profile
 
     override val firebaseAuth: FirebaseAuth
         get() = rememberRepository.firebaseAuth
@@ -33,7 +34,7 @@ internal class AuthUserCaseImpl @Inject constructor(
         )
     }
 
-    override suspend fun saveToken(token: String) {
-        rememberRepository.saveToken(token = token)
+    override suspend fun saveProfile(profileModel: ProfileModel) {
+        rememberRepository.saveProfile(profileModel = profileModel)
     }
 }

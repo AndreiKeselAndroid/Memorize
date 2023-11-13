@@ -32,6 +32,7 @@ import androidx.navigation.NavHostController
 import com.gmail.remember.R
 import com.gmail.remember.common.components.ItemRememberCard
 import com.gmail.remember.navigation.Screens
+import com.gmail.remember.ui.theme.GrayBlack
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,13 +80,14 @@ internal fun RememberScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                containerColor = Color.White,
+                containerColor = GrayBlack,
                 onClick = {
                     navController.navigate(Screens.AddWordsScreen.route)
 
                 }) {
                 Icon(
                     imageVector = Icons.Default.Add,
+                    tint = Color.White,
                     contentDescription = "Add"
                 )
             }

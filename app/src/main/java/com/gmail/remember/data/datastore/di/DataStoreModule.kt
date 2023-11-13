@@ -2,8 +2,8 @@ package com.gmail.remember.data.datastore.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import com.gmail.remember.data.datastore.utils.dataStore
+import com.gmail.remember.data.datastore.utils.profileDataStore
+import com.gmail.remember.models.ProfileModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +17,7 @@ internal object DataStoreModule {
 
     @Provides
     @Singleton
-    fun provideAuthDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
-        context.dataStore
+    fun provideProfileDataStore(@ApplicationContext context: Context): DataStore<ProfileModel> =
+        context.profileDataStore
 
 }

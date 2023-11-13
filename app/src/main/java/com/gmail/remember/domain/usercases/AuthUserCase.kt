@@ -1,6 +1,7 @@
 package com.gmail.remember.domain.usercases
 
 import androidx.core.app.ComponentActivity
+import com.gmail.remember.models.ProfileModel
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthUserCase {
 
-    val  token: Flow<String?>
+    val profile: Flow<ProfileModel>
 
     val firebaseAuth: FirebaseAuth
 
@@ -17,5 +18,5 @@ interface AuthUserCase {
 
     fun auth(token: String, task: (Task<AuthResult>) -> Unit)
 
-    suspend fun saveToken(token: String)
+    suspend fun saveProfile(profileModel: ProfileModel)
 }

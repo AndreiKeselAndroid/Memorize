@@ -25,9 +25,9 @@ class RememberActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         lifecycleScope.launch {
-            viewModel.token.collectLatest { token ->
+            viewModel.profile.collectLatest { profile ->
                 splashScreen.setKeepOnScreenCondition {
-                    token.isNullOrEmpty() &&
+                    profile?.idToken.isNullOrEmpty() &&
                             viewModel.firebaseAuth.currentUser != null
                 }
             }
