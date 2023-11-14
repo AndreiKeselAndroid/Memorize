@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Запоминалка</string>
-    <string name="settings">Настройки</string>
     <string name="add">Добавить слово</string>
     <string name="chose_google_account">Выбрать Google аккаунт для входа</string>
     <string name="english">English</string>
@@ -8,4 +7,6 @@
     <string name="add_button">Добавить</string>
     <string name="add_word_success">Слово добавлено</string>
     <string name="not_add_word">Слово не добавлено</string>
+    <string name="add_words">Выберите слова</string>
+    <string name="on_notifications">Включить уведомления для заучивания слов</string>
 </resources>

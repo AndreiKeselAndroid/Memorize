@@ -1,4 +1,4 @@
-package com.gmail.remember.data.api.models
+package com.gmail.remember.data.api.models.dictionary
 
 
 import kotlinx.serialization.SerialName
@@ -11,7 +11,7 @@ data class DictionaryRsItem(
     @SerialName("meanings")
     val meanings: List<Meaning>,
     @SerialName("phonetics")
-    val phonetics: List<Phonetic>,
+    val phonetics: List<Phonetic?>,
     @SerialName("sourceUrls")
     val sourceUrls: List<String>,
     @SerialName("word")

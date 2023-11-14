@@ -6,9 +6,11 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,11 +27,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.gmail.remember.R
 import com.gmail.remember.models.RememberWordModel
 import com.gmail.remember.ui.theme.GrayBlack
 import kotlinx.coroutines.Dispatchers
@@ -39,8 +44,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun ItemRememberCard(
     model: RememberWordModel = RememberWordModel(),
-    onClick: () -> Unit = {},
-    onLongClick: () -> Unit = {}
+    enableMultiSelect: Boolean = false,
+    onLongClick: (RememberWordModel) -> Unit = {},
+    onClick: (RememberWordModel) -> Unit = {}
 ) {
     var isEnglish by remember { mutableStateOf(false) }
     var value by remember { mutableStateOf(0f) }
@@ -52,7 +58,7 @@ fun ItemRememberCard(
         label = ""
     ) { values ->
         isEnglish = values == 180f
-        if (isEnglish) scope.launch(Dispatchers.IO) {
+        if (isEnglish && model.url.isNotEmpty()) scope.launch(Dispatchers.IO) {
             MediaPlayer().apply {
                 reset()
                 setDataSource(applicationContext, Uri.parse(model.url))
@@ -62,37 +68,46 @@ fun ItemRememberCard(
         }
     }
 
-
     Card(modifier = Modifier
         .graphicsLayer { rotationX = angle }
         .padding(8.dp)
         .fillMaxWidth()
         .combinedClickable(
             onClick = {
-                value = if (value == 0f) 180f else 0f
-                onClick()
+                if (enableMultiSelect) onClick(model)
+                else value = if (value == 0f) 180f else 0f
             },
-            onLongClick = { onLongClick() }
+            onLongClick = {
+                onLongClick(model)
+            }
         )
         .height(60.dp),
         shape = ShapeDefaults.Large
     ) {
-        Box(
+        Row(
             modifier = Modifier
                 .background(GrayBlack)
                 .fillMaxSize(),
-            contentAlignment = Alignment.Center,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-
             Text(
                 modifier = Modifier
                     .padding(start = 16.dp)
-                    .fillMaxWidth()
                     .graphicsLayer { rotationX = angle },
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Start,
                 text = if (isEnglish) model.wordEng else model.wordRu,
                 color = Color.White,
                 overflow = TextOverflow.Ellipsis,
+            )
+
+            if (model.isCheck) Image(
+                modifier = Modifier
+                    .graphicsLayer { rotationX = angle }
+                    .padding(end = 16.dp),
+                painter = painterResource(id = R.drawable.ic_check),
+                colorFilter = ColorFilter.tint(Color.White),
+                contentDescription = "Check"
             )
         }
     }

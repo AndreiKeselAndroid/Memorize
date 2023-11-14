@@ -49,7 +49,7 @@ internal class AddWordsViewModel @Inject constructor(
     fun clickAdd(
         enWord: String,
         ruWord: String,
-        result:(Task<Void>)->Unit
+        result: (Task<Void>) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             addWordsUserCase.addWord(
@@ -57,13 +57,20 @@ internal class AddWordsViewModel @Inject constructor(
                     wordEng = enWord,
                     wordRu = ruWord,
                     url = try {
-                        addWordsUserCase.getWordFromDictionary(word = enWord)
-                            ?.last()?.phonetics?.last()?.audio ?: ""
+                        var url = ""
+                        addWordsUserCase.getWordFromDictionary(word = enWord)?.forEach { item ->
+                            item.phonetics.forEach { phonetic ->
+                                if (phonetic?.license?.name == "BY 3.0 US")
+                                    url = phonetic.audio
+                                else phonetic?.audio
+                            }
+                        }
+                        url
                     } catch (e: Exception) {
                         ""
                     }
                 )
-            ).addOnCompleteListener {task->
+            ).addOnCompleteListener { task ->
                 viewModelScope.launch {
                     _ruWord.emit("")
                     _enWord.emit("")

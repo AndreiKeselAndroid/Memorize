@@ -31,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -113,9 +114,11 @@ internal fun AddWordsScreen(
             )
         },
         bottomBar = {
-            Box( modifier = Modifier
-                .background(Color.Black)
-                .fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .background(Color.Black)
+                    .fillMaxWidth()
+            ) {
                 Button(
                     modifier = Modifier.padding(bottom = 24.dp),
                     enabled = enableButton,
@@ -128,10 +131,11 @@ internal fun AddWordsScreen(
                                 snackBarHostState
                                     .showSnackbar(
                                         message = if (task.isSuccessful) messageSuccess else messageNotSuccess,
-                                        actionLabel = "Ok",
-                                        duration = SnackbarDuration.Indefinite
+                                        duration = SnackbarDuration.Short,
+                                        withDismissAction = true
                                     )
                             }
+                            if (task.isSuccessful) focusManager.moveFocus(FocusDirection.Up)
                         }
                     }
                 ) {

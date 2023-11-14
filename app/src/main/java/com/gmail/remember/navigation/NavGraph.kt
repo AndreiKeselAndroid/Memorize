@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import com.gmail.remember.screens.addwords.AddWordsScreen
 import com.gmail.remember.screens.auth.AuthScreen
 import com.gmail.remember.screens.remember.RememberScreen
-import com.gmail.remember.screens.settings.SettingsScreen
+import com.gmail.remember.screens.profile.ProfileScreen
 
 @Composable
 internal fun NavGraph(
@@ -30,8 +30,8 @@ internal fun NavGraph(
             AddWordsScreen(navController = navController)
         }
 
-        composable(route = Screens.SettingsScreen.route) {
-            SettingsScreen(navController = navController)
+        composable(route = Screens.ProfileScreen.route) {
+            ProfileScreen(navController = navController)
         }
     }
 }

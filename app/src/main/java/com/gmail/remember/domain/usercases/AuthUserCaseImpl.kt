@@ -20,14 +20,14 @@ internal class AuthUserCaseImpl @Inject constructor(
     override val firebaseAuth: FirebaseAuth
         get() = rememberRepository.firebaseAuth
 
-    override fun signIn(activity: ComponentActivity, launch: (GoogleSignInClient) -> Unit) {
+    override suspend fun signIn(activity: ComponentActivity, launch: (GoogleSignInClient) -> Unit) {
         rememberRepository.signIn(
             activity = activity,
             launch = launch
         )
     }
 
-    override fun auth(token: String, task: (Task<AuthResult>) -> Unit) {
+    override suspend fun auth(token: String, task: (Task<AuthResult>) -> Unit) {
         rememberRepository.auth(
             token = token,
             task = task

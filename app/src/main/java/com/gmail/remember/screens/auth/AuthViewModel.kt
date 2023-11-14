@@ -3,8 +3,8 @@ package com.gmail.remember.screens.auth
 import androidx.core.app.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gmail.remember.domain.toModel
 import com.gmail.remember.domain.usercases.AuthUserCase
-import com.gmail.remember.utils.toModel
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.tasks.Task
@@ -20,17 +20,21 @@ class AuthViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun signIn(activity: ComponentActivity, launch: (GoogleSignInClient) -> Unit) {
-        authUserCase.signIn(
-            activity = activity,
-            launch = launch
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            authUserCase.signIn(
+                activity = activity,
+                launch = launch
+            )
+        }
     }
 
     fun auth(token: String, task: (Task<AuthResult>) -> Unit) {
-        authUserCase.auth(
-            token = token,
-            task = task
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            authUserCase.auth(
+                token = token,
+                task = task
+            )
+        }
     }
 
     fun saveProfile(account: GoogleSignInAccount) {

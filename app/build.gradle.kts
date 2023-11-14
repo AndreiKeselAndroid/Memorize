@@ -103,4 +103,6 @@ dependencies {
 
     implementation("androidx.datastore:datastore:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+
+    implementation("io.coil-kt:coil-compose:2.0.0-rc01")
 }

@@ -14,9 +14,9 @@ interface AuthUserCase {
 
     val firebaseAuth: FirebaseAuth
 
-    fun signIn(activity: ComponentActivity, launch: (GoogleSignInClient) -> Unit)
+    suspend fun signIn(activity: ComponentActivity, launch: (GoogleSignInClient) -> Unit)
 
-    fun auth(token: String, task: (Task<AuthResult>) -> Unit)
+    suspend fun auth(token: String, task: (Task<AuthResult>) -> Unit)
 
     suspend fun saveProfile(profileModel: ProfileModel)
 }

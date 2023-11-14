@@ -1,4 +1,4 @@
-package com.gmail.remember.data.api.models
+package com.gmail.remember.data.api.models.dictionary
 
 
 import kotlinx.serialization.SerialName

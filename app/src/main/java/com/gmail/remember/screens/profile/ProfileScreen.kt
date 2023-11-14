@@ -1,7 +1,8 @@
-package com.gmail.remember.screens.settings
+package com.gmail.remember.screens.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,20 +16,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.gmail.remember.R
+import com.gmail.remember.common.components.Switch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun SettingsScreen(
+internal fun ProfileScreen(
     navController: NavHostController,
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
+    val displayName by viewModel.displayName.collectAsState()
+    val checked by viewModel.checked.collectAsState()
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -48,7 +55,9 @@ internal fun SettingsScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = stringResource(id = R.string.settings)
+                            text = displayName,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 },
@@ -64,13 +73,20 @@ internal fun SettingsScreen(
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .background(color = Color.Black)
                 .fillMaxSize()
         ) {
 
+            Switch(
+                checked = checked,
+                text = R.string.on_notifications,
+                onCheckedChange = { value ->
+                    viewModel.onCheckedChange(value)
+                }
+            )
         }
     }
 }

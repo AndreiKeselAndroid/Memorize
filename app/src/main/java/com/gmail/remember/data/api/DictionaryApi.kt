@@ -1,6 +1,6 @@
 package com.gmail.remember.data.api
 
-import com.gmail.remember.data.api.models.DictionaryRs
+import com.gmail.remember.data.api.models.dictionary.DictionaryRs
 import retrofit2.http.GET
 import retrofit2.http.Path
 
