@@ -50,7 +50,7 @@ fun AuthScreen(
                     account.idToken?.let { idToken ->
                         viewModel.auth(idToken) {
                             if (it.isSuccessful) {
-                                navController.navigate(Screens.RememberScreen.route) {
+                                navController.navigate(Screens.MainScreen.route) {
                                     popUpTo(navController.graph.id) {
                                         inclusive = true
                                     }

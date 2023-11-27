@@ -1,16 +1,20 @@
-package com.gmail.remember.screens.remember
+package com.gmail.remember.screens.words
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gmail.remember.domain.usercases.RememberUserCase
-import com.gmail.remember.models.RememberWordModel
+import com.gmail.remember.domain.usercases.WordsUserCase
+import com.gmail.remember.models.WordModel
+import com.gmail.remember.navigation.CHILD_NAME
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -19,35 +23,42 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class RememberViewModel @Inject constructor(
-    private val rememberUserCase: RememberUserCase
+internal class WordsViewModel @Inject constructor(
+    private val rememberUserCase: WordsUserCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _selectedWords: MutableStateFlow<List<RememberWordModel?>> =
-        MutableStateFlow(emptyList())
-    val selectedWords: StateFlow<List<RememberWordModel?>> = _selectedWords.asStateFlow()
-
-    val photoUrl: StateFlow<String> by lazy {
-        rememberUserCase.profile.map { profile ->
-            profile.photoUrl ?: ""
+    val countSuccess: StateFlow<Int> by lazy {
+        rememberUserCase.settingsProfile.map { model ->
+            model.countSuccess.toInt()
         }
-            .flowOn(Dispatchers.IO)
-            .stateIn(viewModelScope, SharingStarted.Lazily, "")
+            .stateIn(viewModelScope, SharingStarted.Lazily, 5)
     }
 
-    val words: StateFlow<List<RememberWordModel?>> by lazy {
-        rememberUserCase.words.combine(_selectedWords.asStateFlow()) { snapshots, words ->
-            snapshots.children.map { snapshot ->
-                if (words.contains(snapshot.getValue(RememberWordModel::class.java)))
-                    snapshot.getValue(RememberWordModel::class.java)?.copy(isCheck = true)
-                else snapshot.getValue(RememberWordModel::class.java)
+    val childName: StateFlow<String> by lazy {
+        savedStateHandle.getStateFlow(CHILD_NAME, "")
+    }
+
+    private val _selectedWords: MutableStateFlow<List<WordModel?>> =
+        MutableStateFlow(emptyList())
+    val selectedWords: StateFlow<List<WordModel?>> = _selectedWords.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val words: StateFlow<List<WordModel?>> by lazy {
+        childName.flatMapLatest { name ->
+            rememberUserCase.words(name).combine(_selectedWords.asStateFlow()) { snapshots, words ->
+                snapshots.children.map { snapshot ->
+                    if (words.contains(snapshot.getValue(WordModel::class.java)))
+                        snapshot.getValue(WordModel::class.java)?.copy(isCheck = true)
+                    else snapshot.getValue(WordModel::class.java)
+                }
             }
         }
             .flowOn(Dispatchers.IO)
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     }
 
-    fun enableMultiSelect(word: RememberWordModel, words: List<RememberWordModel?>) {
+    fun enableMultiSelect(word: WordModel, words: List<WordModel?>, childName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             if (words.size > 1) {
                 _selectedWords.update { words ->
@@ -55,7 +66,7 @@ internal class RememberViewModel @Inject constructor(
                         add(word)
                     }.toList()
                 }
-            } else deleteWords(listOf(word))
+            } else deleteWords(listOf(word), childName = childName)
         }
     }
 
@@ -65,7 +76,7 @@ internal class RememberViewModel @Inject constructor(
         }
     }
 
-    fun selectWord(word: RememberWordModel) {
+    fun selectWord(word: WordModel) {
         viewModelScope.launch(Dispatchers.IO) {
             _selectedWords.update { words ->
                 words.toMutableList().apply {
@@ -79,8 +90,8 @@ internal class RememberViewModel @Inject constructor(
     }
 
     fun selectedAllHandler(
-        allWords: List<RememberWordModel?>,
-        selectedWords: List<RememberWordModel?>
+        allWords: List<WordModel?>,
+        selectedWords: List<WordModel?>
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             if (allWords.size == selectedWords.size) unSelectAllWords()
@@ -88,7 +99,7 @@ internal class RememberViewModel @Inject constructor(
         }
     }
 
-    private fun selectAllWords(allWords: List<RememberWordModel?>) {
+    private fun selectAllWords(allWords: List<WordModel?>) {
         _selectedWords.update { words ->
             words.toMutableList().apply {
                 addAll(allWords.filter { model -> model?.isCheck == false })
@@ -104,9 +115,9 @@ internal class RememberViewModel @Inject constructor(
         }
     }
 
-    fun deleteWords(models: List<RememberWordModel?>) {
+    fun deleteWords(models: List<WordModel?>, childName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            rememberUserCase.deleteWords(models = models)
+            rememberUserCase.deleteWords(models = models, childName = childName)
             unSelectAllWords()
         }
     }

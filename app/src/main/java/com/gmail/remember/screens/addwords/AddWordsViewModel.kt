@@ -1,9 +1,11 @@
 package com.gmail.remember.screens.addwords
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gmail.remember.domain.usercases.AddWordsUserCase
-import com.gmail.remember.models.RememberWordModel
+import com.gmail.remember.models.WordModel
+import com.gmail.remember.navigation.CHILD_NAME
 import com.google.android.gms.tasks.Task
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,10 +18,17 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+const val LICENSE = "BY 3.0 US"
+
 @HiltViewModel
 internal class AddWordsViewModel @Inject constructor(
-    private val addWordsUserCase: AddWordsUserCase
+    private val addWordsUserCase: AddWordsUserCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    val childName: StateFlow<String> by lazy {
+        savedStateHandle.getStateFlow(CHILD_NAME, "")
+    }
 
     private val _enWord: MutableStateFlow<String> = MutableStateFlow("")
     val enWord: StateFlow<String> = _enWord.asStateFlow()
@@ -49,18 +58,19 @@ internal class AddWordsViewModel @Inject constructor(
     fun clickAdd(
         enWord: String,
         ruWord: String,
+        childName: String,
         result: (Task<Void>) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             addWordsUserCase.addWord(
-                model = RememberWordModel(
+                model = WordModel(
                     wordEng = enWord,
                     wordRu = ruWord,
                     url = try {
                         var url = ""
                         addWordsUserCase.getWordFromDictionary(word = enWord)?.forEach { item ->
                             item.phonetics.forEach { phonetic ->
-                                if (phonetic?.license?.name == "BY 3.0 US")
+                                if (phonetic?.license?.name == LICENSE)
                                     url = phonetic.audio
                                 else phonetic?.audio
                             }
@@ -68,8 +78,9 @@ internal class AddWordsViewModel @Inject constructor(
                         url
                     } catch (e: Exception) {
                         ""
-                    }
-                )
+                    },
+                ),
+                childName = childName
             ).addOnCompleteListener { task ->
                 viewModelScope.launch {
                     _ruWord.emit("")

@@ -8,5 +8,5 @@ data class ProfileModel(
     val displayName: String? = "",
     val familyName: String? = "",
     val givenName: String? = "",
-    val photoUrl: String? = ""
+    val photoUrl: String? = "",
 )

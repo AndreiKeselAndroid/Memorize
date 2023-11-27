@@ -2,6 +2,7 @@ package com.gmail.remember.common.components
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,7 +26,7 @@ fun Switch(
     onCheckedChange: (Boolean) -> Unit = {},
     checkedThumbColor: Color = Color.Black,
     checkedTrackColor: Color = Color.White,
-    uncheckedThumbColor: Color = Color.DarkGray,
+    uncheckedThumbColor: Color = Color.LightGray,
     uncheckedTrackColor: Color = Color.White,
     checkedBorderColor: Color = Color.White,
     uncheckedBorderColor: Color = Color.Black,
@@ -43,6 +44,8 @@ fun Switch(
             modifier = Modifier
                 .padding(top = 16.dp, bottom = 16.dp, end = 16.dp)
                 .clickable(
+                    indication = null,
+                    interactionSource = MutableInteractionSource(),
                     onClick = {
                         onCheckedChange(checked.not())
                     }
@@ -51,6 +54,7 @@ fun Switch(
             fontWeight = FontWeight.Normal,
             textAlign = TextAlign.Center,
             lineHeight = 24.sp,
+            fontSize = 18.sp,
             color = textColor,
             style = MaterialTheme.typography.bodyMedium
         )

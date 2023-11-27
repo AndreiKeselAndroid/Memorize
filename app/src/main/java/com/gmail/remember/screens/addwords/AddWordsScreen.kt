@@ -62,6 +62,7 @@ internal fun AddWordsScreen(
     val focusRequester = remember { FocusRequester() }
     val enWord by viewModel.enWord.collectAsState()
     val ruWord by viewModel.ruWord.collectAsState()
+    val childName by viewModel.childName.collectAsState()
     val enableButton by viewModel.enableButton.collectAsState()
     val messageSuccess = stringResource(R.string.add_word_success)
     val messageNotSuccess = stringResource(R.string.not_add_word)
@@ -103,7 +104,11 @@ internal fun AddWordsScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = {
+                        focusManager.clearFocus()
+                        navController.popBackStack()
+                    }
+                    ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             tint = Color.White,
@@ -125,7 +130,8 @@ internal fun AddWordsScreen(
                     onClick = {
                         viewModel.clickAdd(
                             enWord = enWord,
-                            ruWord = ruWord
+                            ruWord = ruWord,
+                            childName = childName
                         ) { task ->
                             scope.launch {
                                 snackBarHostState

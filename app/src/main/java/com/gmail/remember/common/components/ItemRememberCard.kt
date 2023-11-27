@@ -10,13 +10,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.ShapeDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +26,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
@@ -35,7 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gmail.remember.R
-import com.gmail.remember.models.RememberWordModel
+import com.gmail.remember.models.WordModel
 import com.gmail.remember.ui.theme.GrayBlack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,10 +47,11 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ItemRememberCard(
-    model: RememberWordModel = RememberWordModel(),
+    model: WordModel = WordModel(),
+    countSuccess: Int = 5,
     enableMultiSelect: Boolean = false,
-    onLongClick: (RememberWordModel) -> Unit = {},
-    onClick: (RememberWordModel) -> Unit = {}
+    onLongClick: (WordModel) -> Unit = {},
+    onClick: (WordModel) -> Unit = {}
 ) {
     var isEnglish by remember { mutableStateOf(false) }
     var value by remember { mutableStateOf(0f) }
@@ -68,25 +73,49 @@ fun ItemRememberCard(
         }
     }
 
-    Card(modifier = Modifier
-        .graphicsLayer { rotationX = angle }
-        .padding(8.dp)
-        .fillMaxWidth()
-        .combinedClickable(
-            onClick = {
-                if (enableMultiSelect) onClick(model)
-                else value = if (value == 0f) 180f else 0f
-            },
-            onLongClick = {
-                onLongClick(model)
-            }
-        )
-        .height(60.dp),
-        shape = ShapeDefaults.Large
+    Box(
+        modifier = Modifier
+            .graphicsLayer { rotationX = angle }
+            .padding(8.dp)
+            .clip(shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomEnd = 16.dp))
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = {
+                    if (enableMultiSelect) onClick(model)
+                    else value = if (value == 0f) 180f else 0f
+                },
+                onLongClick = {
+                    onLongClick(model)
+                }
+            )
+            .height(60.dp)
     ) {
+
         Row(
             modifier = Modifier
                 .background(GrayBlack)
+                .drawBehind {
+                    drawRect(
+                        color = GrayBlack
+                    )
+                    drawRect(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color.Red,
+                                Color.Yellow,
+                                Color.Green,
+                            )
+                        ),
+                        size = Size(
+                            width = try {
+                                size.width * (model.countSuccess.toFloat() / countSuccess.toFloat())
+                            } catch (e: Exception) {
+                                0f
+                            },
+                            height = size.height
+                        ),
+                    )
+                }
                 .fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
