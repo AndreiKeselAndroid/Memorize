@@ -37,6 +37,7 @@ import com.gmail.remember.common.components.ItemRememberCard
 import com.gmail.remember.models.WordModel
 import com.gmail.remember.navigation.Screens
 import com.gmail.remember.navigation.navigateSafeArgs
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +71,11 @@ internal fun WordsScreen(
                         Text(
                             text = if (selectedWords.isNotEmpty()) stringResource(
                                 id = R.string.add_words
-                            ) else childName.uppercase()
+                            ) else childName.replaceFirstChar { char ->
+                                if (char.isLowerCase()) char.titlecase(
+                                    Locale.ROOT
+                                ) else char.toString()
+                            }
                         )
                     }
                 },
