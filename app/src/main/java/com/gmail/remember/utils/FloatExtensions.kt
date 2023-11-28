@@ -23,7 +23,7 @@ fun Float.toBrush(): Brush = when (this) {
         )
     )
 
-    in 0f..0.5f -> Brush.verticalGradient(
+    in 0.01f..0.5f -> Brush.verticalGradient(
         colors = listOf(
             Color.Red,
             Color.Yellow.copy(0.32f)
@@ -32,8 +32,8 @@ fun Float.toBrush(): Brush = when (this) {
 
     else -> Brush.verticalGradient(
         colors = listOf(
-            Color.Green.copy(alpha = 0.32f),
-            Color.Green
+            Color.White.copy(0.32f),
+            Color.White.copy(0.32f)
         )
     )
 }
