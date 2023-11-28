@@ -192,13 +192,41 @@ internal class RememberRepositoryImpl @Inject constructor(
             .child(DAYS)
             .setValue(
                 hashMapOf(
-                    MONDAY.toDayName() to DayModel(name = MONDAY.toDayName(), check = false),
-                    TUESDAY.toDayName() to DayModel(name = TUESDAY.toDayName(), check = false),
-                    WEDNESDAY.toDayName() to DayModel(name = WEDNESDAY.toDayName(), check = false),
-                    THURSDAY.toDayName() to DayModel(name = THURSDAY.toDayName(), check = false),
-                    FRIDAY.toDayName() to DayModel(name = FRIDAY.toDayName(), check = false),
-                    SATURDAY.toDayName() to DayModel(name = SATURDAY.toDayName(), check = false),
-                    SUNDAY.toDayName() to DayModel(name = SUNDAY.toDayName(), check = false),
+                    MONDAY.toDayName() to DayModel(
+                        name = MONDAY.toDayName(),
+                        check = false,
+                        id = 0
+                    ),
+                    TUESDAY.toDayName() to DayModel(
+                        name = TUESDAY.toDayName(),
+                        check = false,
+                        id = 1
+                    ),
+                    WEDNESDAY.toDayName() to DayModel(
+                        name = WEDNESDAY.toDayName(),
+                        check = false,
+                        id = 2
+                    ),
+                    THURSDAY.toDayName() to DayModel(
+                        name = THURSDAY.toDayName(),
+                        check = false,
+                        id = 3
+                    ),
+                    FRIDAY.toDayName() to DayModel(
+                        name = FRIDAY.toDayName(),
+                        check = false,
+                        id = 4
+                    ),
+                    SATURDAY.toDayName() to DayModel(
+                        name = SATURDAY.toDayName(),
+                        check = false,
+                        id = 5
+                    ),
+                    SUNDAY.toDayName() to DayModel(
+                        name = SUNDAY.toDayName(),
+                        check = false,
+                        id = 6
+                    ),
                 )
             )
     }
@@ -209,13 +237,29 @@ internal class RememberRepositoryImpl @Inject constructor(
             .child(DAYS)
             .setValue(
                 hashMapOf(
-                    MONDAY.toDayName() to DayModel(name = MONDAY.toDayName(), check = true),
-                    TUESDAY.toDayName() to DayModel(name = TUESDAY.toDayName(), check = true),
-                    WEDNESDAY.toDayName() to DayModel(name = WEDNESDAY.toDayName(), check = true),
-                    THURSDAY.toDayName() to DayModel(name = THURSDAY.toDayName(), check = true),
-                    FRIDAY.toDayName() to DayModel(name = FRIDAY.toDayName(), check = true),
-                    SATURDAY.toDayName() to DayModel(name = SATURDAY.toDayName(), check = true),
-                    SUNDAY.toDayName() to DayModel(name = SUNDAY.toDayName(), check = true),
+                    MONDAY.toDayName() to DayModel(name = MONDAY.toDayName(), check = true, id = 0),
+                    TUESDAY.toDayName() to DayModel(
+                        name = TUESDAY.toDayName(),
+                        check = true,
+                        id = 1
+                    ),
+                    WEDNESDAY.toDayName() to DayModel(
+                        name = WEDNESDAY.toDayName(),
+                        check = true,
+                        id = 2
+                    ),
+                    THURSDAY.toDayName() to DayModel(
+                        name = THURSDAY.toDayName(),
+                        check = true,
+                        id = 3
+                    ),
+                    FRIDAY.toDayName() to DayModel(name = FRIDAY.toDayName(), check = true, id = 4),
+                    SATURDAY.toDayName() to DayModel(
+                        name = SATURDAY.toDayName(),
+                        check = true,
+                        id = 5
+                    ),
+                    SUNDAY.toDayName() to DayModel(name = SUNDAY.toDayName(), check = true, id = 6),
                 )
             )
     }

@@ -68,9 +68,9 @@ internal fun WordsScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = if (selectedWords.isNotEmpty())  stringResource(
+                            text = if (selectedWords.isNotEmpty()) stringResource(
                                 id = R.string.add_words
-                            ) else childName
+                            ) else childName.uppercase()
                         )
                     }
                 },
@@ -104,7 +104,7 @@ internal fun WordsScreen(
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_check),
-                            tint = Color.White,
+                            tint = Color.Green,
                             contentDescription = "Check"
                         )
                     }
@@ -123,7 +123,7 @@ internal fun WordsScreen(
                 }) {
                 if (selectedWords.isNotEmpty()) Icon(
                     imageVector = Icons.Default.Delete,
-                    tint = Color.Black,
+                    tint = Color.Red,
                     contentDescription = "delete"
                 )
                 else Icon(

@@ -29,18 +29,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gmail.remember.R
 import com.gmail.remember.models.WordModel
 import com.gmail.remember.ui.theme.GrayBlack
+import com.gmail.remember.utils.toBrushHorizontal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -99,13 +100,7 @@ fun ItemRememberCard(
                         color = GrayBlack
                     )
                     drawRect(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                Color.Red,
-                                Color.Yellow,
-                                Color.Green,
-                            )
-                        ),
+                        brush = (model.countSuccess.toFloat() / countSuccess.toFloat()).toBrushHorizontal(),
                         size = Size(
                             width = try {
                                 size.width * (model.countSuccess.toFloat() / countSuccess.toFloat())
@@ -125,7 +120,9 @@ fun ItemRememberCard(
                     .padding(start = 16.dp)
                     .graphicsLayer { rotationX = angle },
                 textAlign = TextAlign.Start,
-                text = if (isEnglish) model.wordEng else model.wordRu,
+                text = if (isEnglish) model.wordEng.uppercase()
+                else model.wordRu.uppercase(),
+                fontWeight = FontWeight.Bold,
                 color = Color.White,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -135,7 +132,7 @@ fun ItemRememberCard(
                     .graphicsLayer { rotationX = angle }
                     .padding(end = 16.dp),
                 painter = painterResource(id = R.drawable.ic_check),
-                colorFilter = ColorFilter.tint(Color.White),
+                colorFilter = ColorFilter.tint(Color.Green),
                 contentDescription = "Check"
             )
         }

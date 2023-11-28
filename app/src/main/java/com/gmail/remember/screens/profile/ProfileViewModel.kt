@@ -37,7 +37,9 @@ internal class ProfileViewModel @Inject constructor(
 
     val days: StateFlow<List<DayModel>> by lazy {
         profileUserCase.settingsProfile.map { profile ->
-            profile.days.values.toList()
+            profile.days.values.sortedBy { model ->
+                model.id
+            }.toList()
         }
             .flowOn(Dispatchers.IO)
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())

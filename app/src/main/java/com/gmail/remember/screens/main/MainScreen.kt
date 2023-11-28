@@ -1,11 +1,10 @@
 package com.gmail.remember.screens.main
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +14,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
@@ -39,24 +37,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.gmail.remember.R
 import com.gmail.remember.common.components.Button
+import com.gmail.remember.common.components.ItemBrainCard
 import com.gmail.remember.common.components.OutlineTextField
 import com.gmail.remember.navigation.Screens
 import com.gmail.remember.navigation.navigateSafeArgs
@@ -77,7 +70,7 @@ internal fun MainScreen(
     val focusRequester = remember { FocusRequester() }
     val displayMetrics = LocalContext.current.resources.displayMetrics
     val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
-    val countColumn by remember { mutableStateOf((screenWidthDp / 160f + 0.5).toInt()) }
+    val countColumn by remember { mutableStateOf((screenWidthDp / 200f + 0.5).toInt()) }
 
     Scaffold(
         modifier = Modifier
@@ -148,70 +141,23 @@ internal fun MainScreen(
         ) {
 
             items(themes) { section ->
-                Box(
-                    modifier = Modifier
-                        .clip(
-                            RoundedCornerShape(
-                                topStart = 16.dp,
-                                topEnd = 16.dp,
-                                bottomEnd = 16.dp
-                            )
-                        )
-                        .combinedClickable(
-                            onClick = {
-                                navController.navigateSafeArgs(
-                                    Screens.WordsScreen.route,
-                                    section.name
-                                )
-                            },
-                            onLongClick = {
-                                viewModel.deleteSection(name = section.name)
-                            }
-                        )
-                        .background(color = Color.Yellow),
-                    contentAlignment = Alignment.BottomCenter
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Canvas(
-                        modifier = Modifier
-                            .clip(
-                                RoundedCornerShape(
-                                    topStart = 16.dp,
-                                    topEnd = 16.dp,
-                                    bottomEnd = 16.dp
-                                )
+                    ItemBrainCard(
+                        progress = section.progress,
+                        onClick = {
+                            navController.navigateSafeArgs(
+                                Screens.WordsScreen.route,
+                                section.name
                             )
-                            .size(160.dp, 180.dp)
-                    ) {
-                        drawRect(
-                            color = GrayBlack
-                        )
-                        drawRect(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Green,
-                                    Color.Yellow,
-                                    Color.Red
-                                )
-                            ),
-                            topLeft = Offset(
-                                x = 0f,
-                                y = size.height * (1 - section.progress)
-                            ),
-                            size = Size(size.width, size.height * section.progress),
-                        )
-                    }
-
-                    Text(
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                            .fillMaxWidth(),
-                        text = section.name.uppercase(),
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        color = Color.White,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 2
+                        },
+                        onLongClick = {
+                            viewModel.deleteSection(name = section.name)
+                        }
                     )
+                    Text(text = section.name.uppercase(), color = Color.White)
                 }
             }
         }

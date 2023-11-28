@@ -47,12 +47,12 @@ fun ProfileModel.toModel(): ProfileSettingsModel = ProfileSettingsModel(
     displayName = this.displayName,
     photoUrl = this.photoUrl,
     days = hashMapOf(
-    MONDAY.toDayName() to DayModel(name = MONDAY.toDayName(), check = false),
-    TUESDAY.toDayName() to DayModel(name = TUESDAY.toDayName(), check = false),
-    WEDNESDAY.toDayName() to DayModel(name = WEDNESDAY.toDayName(), check = false),
-    THURSDAY.toDayName() to DayModel(name = THURSDAY.toDayName(), check = false),
-    FRIDAY.toDayName() to DayModel(name = FRIDAY.toDayName(), check = false),
-    SATURDAY.toDayName() to DayModel(name = SATURDAY.toDayName(), check = false),
-    SUNDAY.toDayName() to DayModel(name = SUNDAY.toDayName(), check = false),
+        MONDAY.toDayName() to DayModel(name = MONDAY.toDayName(), check = false, id = 0),
+        TUESDAY.toDayName() to DayModel(name = TUESDAY.toDayName(), check = false, id = 1),
+        WEDNESDAY.toDayName() to DayModel(name = WEDNESDAY.toDayName(), check = false, id = 2),
+        THURSDAY.toDayName() to DayModel(name = THURSDAY.toDayName(), check = false, id = 3),
+        FRIDAY.toDayName() to DayModel(name = FRIDAY.toDayName(), check = false, id = 4),
+        SATURDAY.toDayName() to DayModel(name = SATURDAY.toDayName(), check = false, id = 5),
+        SUNDAY.toDayName() to DayModel(name = SUNDAY.toDayName(), check = false, id = 6),
     )
 )
