@@ -12,11 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.PathParser
+import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.utils.drawBrain
 import com.gmail.remember.utils.toBrush
 
@@ -30,7 +30,8 @@ fun ItemBrainCard(
 ) {
     Surface(
         modifier = Modifier
-            .clip(shape = ShapeDefaults.Medium)
+            .clip(shape = ShapeDefaults.Large)
+            .background(BlackBrown)
             .combinedClickable(
                 onClick = { onClick() },
                 onLongClick = { onLongClick() }
@@ -39,8 +40,8 @@ fun ItemBrainCard(
     ) {
         Canvas(
             modifier = Modifier
-                .clip(shape = ShapeDefaults.Medium)
-                .background(Color.Black)
+                .clip(shape = ShapeDefaults.Large)
+                .background(BlackBrown)
                 .drawBehind {
                     translate(
                         left = (size.width - 512f) * 0.5f,

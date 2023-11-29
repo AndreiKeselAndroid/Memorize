@@ -1,7 +1,7 @@
 package com.gmail.remember.domain.usercases
 
 import com.gmail.remember.data.RememberRepository
-import com.gmail.remember.models.ProfileModel
+import com.gmail.remember.models.ProfileSettingsModel
 import com.gmail.remember.models.ThemeModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -12,8 +12,8 @@ internal class MainUserCaseImpl @Inject constructor(
     override val themes: Flow<List<ThemeModel>>
         get() = rememberRepository.themes
 
-    override val profile: Flow<ProfileModel>
-        get() = rememberRepository.profile
+    override val settingsProfile: Flow<ProfileSettingsModel>
+        get() = rememberRepository.settingsProfile
 
     override suspend fun addSection(name: String) {
         rememberRepository.addSection(name = name)
@@ -21,5 +21,9 @@ internal class MainUserCaseImpl @Inject constructor(
 
     override suspend fun deleteSection(name: String) {
         rememberRepository.deleteSection(name = name)
+    }
+
+    override suspend fun checkTheme(name: String) {
+        rememberRepository.checkTheme(name = name)
     }
 }

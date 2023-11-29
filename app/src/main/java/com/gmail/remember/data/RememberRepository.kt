@@ -2,7 +2,6 @@ package com.gmail.remember.data
 
 import androidx.core.app.ComponentActivity
 import com.gmail.remember.data.api.models.dictionary.DictionaryRs
-import com.gmail.remember.models.ProfileModel
 import com.gmail.remember.models.ProfileSettingsModel
 import com.gmail.remember.models.ThemeModel
 import com.gmail.remember.models.WordModel
@@ -17,8 +16,6 @@ interface RememberRepository {
 
     val settingsProfile: Flow<ProfileSettingsModel>
 
-    val profile: Flow<ProfileModel>
-
     val firebaseAuth: FirebaseAuth
 
     val themes: Flow<List<ThemeModel>>
@@ -29,7 +26,7 @@ interface RememberRepository {
 
     suspend fun auth(token: String, task: (Task<AuthResult>) -> Unit)
 
-    suspend fun saveProfile(profileModel: ProfileModel)
+    suspend fun saveProfile(profileModel: ProfileSettingsModel)
 
     suspend fun getWordFromDictionary(word: String): DictionaryRs?
 
@@ -44,4 +41,5 @@ interface RememberRepository {
     suspend fun unCheckDay(name: String)
     suspend fun unCheckAllDays()
     suspend fun checkAllDays()
+    suspend fun checkTheme(name: String)
 }

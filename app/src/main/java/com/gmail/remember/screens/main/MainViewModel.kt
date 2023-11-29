@@ -33,15 +33,16 @@ class MainViewModel @Inject constructor(
     }
 
     val photoUrl: StateFlow<String> by lazy {
-        mainUserCase.profile.map { profile ->
+        mainUserCase.settingsProfile.map { profile ->
             profile.photoUrl ?: ""
         }
             .flowOn(Dispatchers.IO)
             .stateIn(viewModelScope, SharingStarted.Lazily, "")
     }
 
-    fun addSection(name: String) {
+    fun addSection(name: String, themes: List<ThemeModel>) {
         viewModelScope.launch {
+            if (themes.isEmpty()) mainUserCase.checkTheme(name = name)
             mainUserCase.addSection(name = name)
         }
     }
@@ -65,9 +66,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-     fun deleteSection(name: String) {
-         viewModelScope.launch {
-             mainUserCase.deleteSection(name = name)
-         }
-     }
+    fun deleteSection(name: String) {
+        viewModelScope.launch {
+            mainUserCase.deleteSection(name = name)
+        }
+    }
 }

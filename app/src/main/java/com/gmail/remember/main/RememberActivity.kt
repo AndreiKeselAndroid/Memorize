@@ -9,14 +9,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.gmail.remember.navigation.NavGraph
+import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.RememberTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,13 +32,14 @@ class RememberActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        actionBar?.hide()
         registerPermissionListener(splashScreen = splashScreen)
         checkNotificationPermission(splashScreen = splashScreen)
     }
 
     private fun initialization(splashScreen: SplashScreen) {
         lifecycleScope.launch {
-            viewModel.profile.collectLatest { profile ->
+            viewModel.settingsProfile.collectLatest { profile ->
                 splashScreen.setKeepOnScreenCondition {
                     profile?.idToken.isNullOrEmpty() &&
                             viewModel.firebaseAuth.currentUser != null
@@ -47,15 +49,18 @@ class RememberActivity : ComponentActivity() {
 
         setContent {
             val systemUiController = rememberSystemUiController()
+            val graphiteBlack = GraphiteBlack
+            val darkIcons = !isSystemInDarkTheme()
+
             SideEffect {
                 systemUiController.apply {
                     setStatusBarColor(
-                        color = Color.Black,
-                        darkIcons = false
+                        color = graphiteBlack,
+                        darkIcons = darkIcons
                     )
                     setNavigationBarColor(
-                        color = Color.Black,
-                        darkIcons = false
+                        color = graphiteBlack,
+                        darkIcons = darkIcons
                     )
                 }
             }

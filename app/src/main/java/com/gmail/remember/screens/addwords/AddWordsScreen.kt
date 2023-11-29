@@ -5,13 +5,16 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -46,6 +48,10 @@ import androidx.navigation.NavHostController
 import com.gmail.remember.R
 import com.gmail.remember.common.components.Button
 import com.gmail.remember.common.components.OutlineTextField
+import com.gmail.remember.ui.theme.GraphiteBlack
+import com.gmail.remember.ui.theme.GrayishOrange
+import com.gmail.remember.ui.theme.UmberGray
+import com.gmail.remember.ui.theme.White
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -83,45 +89,54 @@ internal fun AddWordsScreen(
                     }
                 )
             }
-            .background(color = Color.Black),
+            .background(color = GraphiteBlack),
         topBar = {
-            TopAppBar(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                colors = TopAppBarDefaults
-                    .centerAlignedTopAppBarColors(
-                        containerColor = Color.Black,
-                        titleContentColor = Color.White
-                    ),
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.add)
-                        )
+            Column {
+                TopAppBar(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    colors = TopAppBarDefaults
+                        .centerAlignedTopAppBarColors(
+                            containerColor = GraphiteBlack,
+                            titleContentColor = GrayishOrange
+                        ),
+                    title = {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.add)
+                            )
+                        }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            focusManager.clearFocus()
+                            navController.popBackStack()
+                        }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                tint = GrayishOrange,
+                                contentDescription = "BackIcon"
+                            )
+                        }
+                    },
+                    actions = {
+                        Spacer(modifier = Modifier.size(40.0.dp))
                     }
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        focusManager.clearFocus()
-                        navController.popBackStack()
-                    }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            tint = Color.White,
-                            contentDescription = "BackIcon"
-                        )
-                    }
-                },
-            )
+                )
+                Divider(
+                    thickness = 0.5.dp,
+                    color = UmberGray
+                )
+            }
         },
         bottomBar = {
             Box(
                 modifier = Modifier
-                    .background(Color.Black)
+                    .background(GraphiteBlack)
                     .fillMaxWidth()
             ) {
                 Button(
@@ -159,7 +174,7 @@ internal fun AddWordsScreen(
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .background(color = Color.Black)
+                .background(color = GraphiteBlack)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
@@ -167,6 +182,7 @@ internal fun AddWordsScreen(
 
             OutlineTextField(
                 modifier = Modifier
+                    .padding(top = 8.dp)
                     .padding(vertical = 8.dp)
                     .focusRequester(focusRequester),
                 value = enWord,
@@ -181,7 +197,7 @@ internal fun AddWordsScreen(
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear",
-                            tint = Color.White
+                            tint = GrayishOrange.copy(alpha = 0.32f)
                         )
                     }
                 }
@@ -201,7 +217,7 @@ internal fun AddWordsScreen(
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear",
-                            tint = Color.White
+                            tint = White.copy(alpha = 0.32f)
                         )
                     }
                 }

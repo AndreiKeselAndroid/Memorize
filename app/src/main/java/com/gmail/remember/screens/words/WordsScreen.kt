@@ -2,10 +2,13 @@ package com.gmail.remember.screens.words
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -13,6 +16,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -26,7 +30,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -37,6 +40,10 @@ import com.gmail.remember.common.components.ItemRememberCard
 import com.gmail.remember.models.WordModel
 import com.gmail.remember.navigation.Screens
 import com.gmail.remember.navigation.navigateSafeArgs
+import com.gmail.remember.ui.theme.GraphiteBlack
+import com.gmail.remember.ui.theme.GrayishOrange
+import com.gmail.remember.ui.theme.UmberGray
+import com.gmail.remember.ui.theme.White
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,72 +60,79 @@ internal fun WordsScreen(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.Black),
+            .background(color = GraphiteBlack),
         topBar = {
-            TopAppBar(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                colors = TopAppBarDefaults
-                    .centerAlignedTopAppBarColors(
-                        containerColor = Color.Black,
-                        titleContentColor = Color.White
-                    ),
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = if (selectedWords.isNotEmpty()) stringResource(
-                                id = R.string.add_words
-                            ) else childName.replaceFirstChar { char ->
-                                if (char.isLowerCase()) char.titlecase(
-                                    Locale.ROOT
-                                ) else char.toString()
-                            }
-                        )
-                    }
-                },
-                navigationIcon = {
-                    if (selectedWords.isNotEmpty()) IconButton(onClick = {
-                        viewModel.disableMultiSelect()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Clear,
-                            tint = Color.White,
-                            contentDescription = "exit"
-                        )
-                    } else
-                        IconButton(onClick = {
-                            navController.popBackStack()
-                        }
+            Column {
+                TopAppBar(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    colors = TopAppBarDefaults
+                        .centerAlignedTopAppBarColors(
+                            containerColor = GraphiteBlack,
+                            titleContentColor = GrayishOrange
+                        ),
+                    title = {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                tint = Color.White,
-                                contentDescription = "BackIcon"
+                            Text(
+                                text = if (selectedWords.isNotEmpty()) stringResource(
+                                    id = R.string.add_words
+                                ) else childName.replaceFirstChar { char ->
+                                    if (char.isLowerCase()) char.titlecase(
+                                        Locale.ROOT
+                                    ) else char.toString()
+                                }
                             )
                         }
-                },
-                actions = {
-                    if (selectedWords.isNotEmpty()) IconButton(onClick = {
-                        viewModel.selectedAllHandler(
-                            allWords = words,
-                            selectedWords = selectedWords,
-                        )
-                    }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_check),
-                            tint = Color.Green,
-                            contentDescription = "Check"
-                        )
+                    },
+                    navigationIcon = {
+                        if (selectedWords.isNotEmpty()) IconButton(onClick = {
+                            viewModel.disableMultiSelect()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                tint = GrayishOrange,
+                                contentDescription = "exit"
+                            )
+                        } else
+                            IconButton(onClick = {
+                                navController.popBackStack()
+                            }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBack,
+                                    tint = GrayishOrange,
+                                    contentDescription = "BackIcon"
+                                )
+                            }
+                    },
+                    actions = {
+                        if (selectedWords.isNotEmpty()) IconButton(onClick = {
+                            viewModel.selectedAllHandler(
+                                allWords = words,
+                                selectedWords = selectedWords,
+                            )
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_check),
+                                tint = White,
+                                contentDescription = "Check"
+                            )
+                        }
+                        else Spacer(modifier = Modifier.size(40.0.dp))
                     }
-                }
-            )
+                )
+                Divider(
+                    thickness = 0.5.dp,
+                    color = UmberGray
+                )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
-                containerColor = Color.White,
+                containerColor = GrayishOrange,
                 onClick = {
                     if (selectedWords.isNotEmpty()) viewModel.deleteWords(selectedWords, childName)
                     else navController.navigateSafeArgs(
@@ -128,12 +142,12 @@ internal fun WordsScreen(
                 }) {
                 if (selectedWords.isNotEmpty()) Icon(
                     imageVector = Icons.Default.Delete,
-                    tint = Color.Red,
+                    tint = GraphiteBlack,
                     contentDescription = "delete"
                 )
                 else Icon(
                     imageVector = Icons.Default.Add,
-                    tint = Color.Black,
+                    tint = GraphiteBlack,
                     contentDescription = "Add"
                 )
             }
@@ -141,7 +155,7 @@ internal fun WordsScreen(
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
-                .background(color = Color.Black)
+                .background(color = GraphiteBlack)
                 .fillMaxSize()
                 .padding(paddingValues),
             contentPadding = PaddingValues(8.dp),

@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,19 +21,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gmail.remember.ui.theme.GraphiteBlack
+import com.gmail.remember.ui.theme.GrayishOrange
+import com.gmail.remember.ui.theme.UmberGray
 
 @Composable
 fun Switch(
     checked: Boolean = true,
     onCheckedChange: (Boolean) -> Unit = {},
-    checkedThumbColor: Color = Color.Black,
-    checkedTrackColor: Color = Color.White,
-    uncheckedThumbColor: Color = Color.LightGray,
-    uncheckedTrackColor: Color = Color.White,
-    checkedBorderColor: Color = Color.White,
-    uncheckedBorderColor: Color = Color.Black,
+    checkedThumbColor: Color = GrayishOrange,
+    checkedTrackColor: Color = UmberGray,
+    uncheckedThumbColor: Color = GrayishOrange.copy(alpha = 0.32f),
+    uncheckedTrackColor: Color = UmberGray,
+    checkedBorderColor: Color = UmberGray,
+    uncheckedBorderColor: Color = UmberGray,
     @StringRes text: Int? = null,
-    textColor: Color = Color.White
+    textColor: Color = if (checked) GrayishOrange else GrayishOrange.copy(alpha = 0.32f)
 ) {
     Row(
         modifier = Modifier
@@ -44,8 +49,8 @@ fun Switch(
             modifier = Modifier
                 .padding(top = 16.dp, bottom = 16.dp, end = 16.dp)
                 .clickable(
-                    indication = null,
-                    interactionSource = MutableInteractionSource(),
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = rememberRipple(color = GraphiteBlack.copy(alpha = 0.32f)),
                     onClick = {
                         onCheckedChange(checked.not())
                     }

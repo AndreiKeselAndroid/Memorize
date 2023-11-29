@@ -32,8 +32,8 @@ fun Float.toBrush(): Brush = when (this) {
 
     else -> Brush.verticalGradient(
         colors = listOf(
-            Color.White.copy(0.32f),
-            Color.White.copy(0.32f)
+            Color.Black.copy(0.32f),
+            Color.Black.copy(0.32f)
         )
     )
 }

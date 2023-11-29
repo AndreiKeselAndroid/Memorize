@@ -40,7 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gmail.remember.R
 import com.gmail.remember.models.WordModel
-import com.gmail.remember.ui.theme.GrayBlack
+import com.gmail.remember.ui.theme.BlackBrown
+import com.gmail.remember.ui.theme.White
 import com.gmail.remember.utils.toBrushHorizontal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,12 +74,13 @@ fun ItemRememberCard(
             }
         }
     }
+    val blackBrown: Color = BlackBrown
 
     Box(
         modifier = Modifier
             .graphicsLayer { rotationX = angle }
             .padding(8.dp)
-            .clip(shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomEnd = 16.dp))
+            .clip(shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp, bottomEnd = 8.dp))
             .fillMaxWidth()
             .combinedClickable(
                 onClick = {
@@ -91,13 +93,12 @@ fun ItemRememberCard(
             )
             .height(60.dp)
     ) {
-
         Row(
             modifier = Modifier
-                .background(GrayBlack)
+                .background(blackBrown)
                 .drawBehind {
                     drawRect(
-                        color = GrayBlack
+                        color = blackBrown
                     )
                     drawRect(
                         brush = (model.countSuccess.toFloat() / countSuccess.toFloat()).toBrushHorizontal(),
@@ -123,7 +124,7 @@ fun ItemRememberCard(
                 text = if (isEnglish) model.wordEng.uppercase()
                 else model.wordRu.uppercase(),
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = White,
                 overflow = TextOverflow.Ellipsis,
             )
 
@@ -132,7 +133,7 @@ fun ItemRememberCard(
                     .graphicsLayer { rotationX = angle }
                     .padding(end = 16.dp),
                 painter = painterResource(id = R.drawable.ic_check),
-                colorFilter = ColorFilter.tint(Color.Green),
+                colorFilter = ColorFilter.tint(White),
                 contentDescription = "Check"
             )
         }

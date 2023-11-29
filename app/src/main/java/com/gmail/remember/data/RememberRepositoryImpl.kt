@@ -12,13 +12,15 @@ import com.gmail.remember.R
 import com.gmail.remember.data.api.DictionaryApi
 import com.gmail.remember.data.api.models.dictionary.DictionaryRs
 import com.gmail.remember.data.creator.ServiceCreator
-import com.gmail.remember.data.datastore.models.auth.ProfilePrefsModel
 import com.gmail.remember.domain.toModel
 import com.gmail.remember.models.DayModel
-import com.gmail.remember.models.ProfileModel
 import com.gmail.remember.models.ProfileSettingsModel
 import com.gmail.remember.models.ThemeModel
 import com.gmail.remember.models.WordModel
+import com.gmail.remember.models.decrypt
+import com.gmail.remember.models.encrypt
+import com.gmail.remember.utils.decrypt
+import com.gmail.remember.utils.encrypt
 import com.gmail.remember.utils.toDayName
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -46,9 +48,9 @@ private const val ALL_DAYS = "allDays"
 private const val IS_REMEMBER = "remember"
 private const val DAYS = "days"
 private const val CHECK_DAY = "check"
+private const val THEME = "theme"
 
 internal class RememberRepositoryImpl @Inject constructor(
-    private val authPrefsModel: ProfilePrefsModel,
     private val serviceCreator: ServiceCreator
 ) : RememberRepository {
 
@@ -56,12 +58,10 @@ internal class RememberRepositoryImpl @Inject constructor(
     override val settingsProfile: Flow<ProfileSettingsModel>
         get() = dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE).snapshots.map { data ->
-                data.getValue(ProfileSettingsModel::class.java) ?: ProfileSettingsModel()
+                data.getValue(ProfileSettingsModel::class.java)?.decrypt() ?: ProfileSettingsModel().decrypt()
             }
 
             .flowOn(Dispatchers.IO)
-    override val profile: Flow<ProfileModel>
-        get() = authPrefsModel.profileModel.flowOn(Dispatchers.IO)
 
     override val firebaseAuth: FirebaseAuth
         get() = Firebase.auth
@@ -75,7 +75,7 @@ internal class RememberRepositoryImpl @Inject constructor(
                     .snapshots
             ) { themes, count ->
                 themes.children.map { children ->
-                    children.toModel(count.value.toString().toInt())
+                    children.toModel(count.value.toString().decrypt().toInt())
                 }
             }
             .flowOn(Dispatchers.IO)
@@ -100,11 +100,10 @@ internal class RememberRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveProfile(profileModel: ProfileModel) {
-        authPrefsModel.saveProfile(profileModel = profileModel)
+    override suspend fun saveProfile(profileModel: ProfileSettingsModel) {
         dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
-            .setValue(profileModel.toModel())
+            .setValue(profileModel.encrypt())
     }
 
     override suspend fun getWordFromDictionary(word: String): DictionaryRs? {
@@ -262,5 +261,12 @@ internal class RememberRepositoryImpl @Inject constructor(
                     SUNDAY.toDayName() to DayModel(name = SUNDAY.toDayName(), check = true, id = 6),
                 )
             )
+    }
+
+    override suspend fun checkTheme(name: String) {
+        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+            .child(PROFILE)
+            .child(THEME)
+            .setValue(name.encrypt())
     }
 }

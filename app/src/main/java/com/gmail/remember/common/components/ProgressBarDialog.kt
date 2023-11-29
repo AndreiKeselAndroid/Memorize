@@ -9,11 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.gmail.remember.ui.theme.GrayishOrange
 
 @Composable
 fun ShowProgressBarDialog(
     modifier: Modifier = Modifier,
-    color: Color = Color.White
+    color: Color = GrayishOrange
 ) {
     Dialog(
         onDismissRequest = {},

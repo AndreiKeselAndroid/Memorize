@@ -1,15 +1,15 @@
 package com.gmail.remember.domain.usercases
 
-import com.gmail.remember.models.ProfileModel
 import com.gmail.remember.models.ProfileSettingsModel
+import com.gmail.remember.models.ThemeModel
 import com.google.firebase.database.DataSnapshot
 import kotlinx.coroutines.flow.Flow
 
 interface ProfileUserCase {
 
-    val settingsProfile: Flow<ProfileSettingsModel>
+    val themes: Flow<List<ThemeModel>>
 
-    val profile: Flow<ProfileModel>
+    val settingsProfile: Flow<ProfileSettingsModel>
     fun words(childName: String): Flow<DataSnapshot>
     suspend fun onCheckedChangeAllDays(value: Boolean)
     suspend fun onCheckedChangeRemember(value: Boolean)
@@ -17,4 +17,5 @@ interface ProfileUserCase {
     suspend fun unCheckDay(name: String)
     suspend fun unCheckAllDays()
     suspend fun checkAllDays()
+    suspend fun checkTheme(name: String)
 }

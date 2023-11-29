@@ -1,6 +1,14 @@
 package com.gmail.remember.models
 
+import com.gmail.remember.utils.decrypt
+import com.gmail.remember.utils.encrypt
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ProfileSettingsModel(
+    val idToken: String? = "",
+    val familyName: String? = "",
+    val givenName: String? = "",
     val displayName: String? = "",
     val photoUrl: String? = "",
     val countSuccess: String = "5",
@@ -8,5 +16,30 @@ data class ProfileSettingsModel(
     val timeTo: String = "21:00",
     val allDays: Boolean = true,
     val remember: Boolean = false,
-    val days: HashMap<String, DayModel> = hashMapOf()
+    val days: HashMap<String, DayModel> = hashMapOf(),
+    val theme: String = ""
+)
+
+fun ProfileSettingsModel.encrypt(): ProfileSettingsModel = this.copy(
+    idToken = this.idToken?.encrypt(),
+    familyName = this.familyName?.encrypt(),
+    givenName = this.givenName?.encrypt(),
+    displayName = this.displayName?.encrypt(),
+    photoUrl = this.photoUrl?.encrypt(),
+    countSuccess = this.countSuccess.encrypt(),
+    timeFrom = this.timeFrom.encrypt(),
+    timeTo = this.timeTo.encrypt(),
+    theme = this.theme.encrypt()
+)
+
+fun ProfileSettingsModel.decrypt(): ProfileSettingsModel = this.copy(
+    idToken = this.idToken?.decrypt(),
+    familyName = this.familyName?.decrypt(),
+    givenName = this.givenName?.decrypt(),
+    displayName = this.displayName?.decrypt(),
+    photoUrl = this.photoUrl?.decrypt(),
+    countSuccess = this.countSuccess.decrypt(),
+    timeFrom = this.timeFrom.decrypt(),
+    timeTo = this.timeTo.decrypt(),
+    theme = this.theme.decrypt()
 )

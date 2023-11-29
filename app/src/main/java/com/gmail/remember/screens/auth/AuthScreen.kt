@@ -4,6 +4,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -15,15 +16,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ComponentActivity
@@ -31,10 +30,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.gmail.remember.R
 import com.gmail.remember.navigation.Screens
+import com.gmail.remember.ui.theme.GraphiteBlack
+import com.gmail.remember.ui.theme.GrayishOrange
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun AuthScreen(
     navController: NavHostController,
@@ -72,7 +72,7 @@ fun AuthScreen(
 
     Box(
         modifier = Modifier
-            .background(Color.Black)
+            .background(GraphiteBlack)
             .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
@@ -80,12 +80,18 @@ fun AuthScreen(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth()
-                .clickable {
-                    viewModel.signIn(activity) { client ->
-                        launcher.launch(client.signInIntent)
+                .clickable(
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    },
+                    indication = null,
+                    onClick = {
+                        viewModel.signIn(activity) { client ->
+                            launcher.launch(client.signInIntent)
+                        }
                     }
-                }
-                .background(Color.Black),
+                )
+                .background(GraphiteBlack),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -98,14 +104,9 @@ fun AuthScreen(
                 tint = Color.Unspecified
             )
             Text(
-                style = TextStyle(
-                    brush = Brush.horizontalGradient(
-                        listOf(Color.Red, Color.Yellow, Color.Green, Color.Blue)
-                    )
-                ),
                 fontSize = 16.sp,
                 text = stringResource(R.string.chose_google_account),
-                color = Color.White
+                color = GrayishOrange
             )
         }
     }

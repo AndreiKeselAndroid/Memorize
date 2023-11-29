@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.Remember" parent="android:Theme.Material.NoActionBar">
-        <item name="android:background">#FF000000</item>
+    <style name="Theme.Remember" parent="android:Theme.DeviceDefault.DayNight" tools:targetApi="q">
     </style>
 
-    <style name="Theme.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#FF000000</item>
+    <style name="Theme.Splash" parent="Theme.SplashScreen.IconBackground">
         <item name="postSplashScreenTheme">@style/Theme.Remember</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
     </style>
 
 </resources>

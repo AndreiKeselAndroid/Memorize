@@ -3,7 +3,7 @@ package com.gmail.remember.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gmail.remember.domain.usercases.AuthUserCase
-import com.gmail.remember.models.ProfileModel
+import com.gmail.remember.models.ProfileSettingsModel
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,8 +18,8 @@ internal class RememberViewModel @Inject constructor(
     val firebaseAuth: FirebaseAuth
         get() = authUserCase.firebaseAuth
 
-    val profile: StateFlow<ProfileModel?> by lazy {
-        authUserCase.profile
+    val settingsProfile: StateFlow<ProfileSettingsModel?> by lazy {
+        authUserCase.settingsProfile
             .stateIn(viewModelScope, SharingStarted.Lazily, null)
     }
 }

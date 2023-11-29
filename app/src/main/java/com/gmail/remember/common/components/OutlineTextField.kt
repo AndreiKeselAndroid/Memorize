@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.gmail.remember.ui.theme.GrayishOrange
+import com.gmail.remember.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,12 +34,12 @@ fun OutlineTextField(
     keyboardActions: ((String) -> Unit) = {},
     onValueChange: ((String) -> Unit) = {},
     trailingIcon: (@Composable () -> Unit) = {},
-    focusedBorderColor: Color = Color.White,
-    unfocusedBorderColor: Color = Color.White.copy(alpha = 0.32f),
-    focusedLabelColor: Color = Color.White,
-    unfocusedLabelColor: Color = Color.White.copy(alpha = 0.32f),
-    textColor: Color = Color.White,
-    cursorColor: Color = Color.White,
+    focusedBorderColor: Color = White,
+    unfocusedBorderColor: Color = GrayishOrange.copy(alpha = 0.32f),
+    focusedLabelColor: Color = White,
+    unfocusedLabelColor: Color = GrayishOrange.copy(alpha = 0.32f),
+    textColor: Color = White,
+    cursorColor: Color = White,
     focusManager: FocusManager
 ) {
     val currentValue by rememberUpdatedState(newValue = value)

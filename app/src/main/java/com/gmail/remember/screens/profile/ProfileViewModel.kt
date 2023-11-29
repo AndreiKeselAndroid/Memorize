@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gmail.remember.models.DayModel
 import com.gmail.remember.domain.usercases.ProfileUserCase
+import com.gmail.remember.models.ThemeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -26,6 +28,17 @@ internal class ProfileViewModel @Inject constructor(
             .flowOn(Dispatchers.IO)
             .stateIn(viewModelScope, SharingStarted.Lazily, true)
     }
+
+    val themes: StateFlow<List<ThemeModel>> =
+        profileUserCase.themes.combine(profileUserCase.settingsProfile){themes,profile->
+            themes.map {model->
+               model.copy(
+                isChecked = model.name == profile.theme
+               )
+            }
+        }
+            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
 
     val isRemember: StateFlow<Boolean> by lazy {
         profileUserCase.settingsProfile.map { model ->
@@ -47,8 +60,8 @@ internal class ProfileViewModel @Inject constructor(
 
 
     val displayName: StateFlow<String> by lazy {
-        profileUserCase.profile.map { profile ->
-            profile.displayName ?: ""
+        profileUserCase.settingsProfile.map { profile ->
+            profile.givenName ?: ""
         }
             .flowOn(Dispatchers.IO)
             .stateIn(viewModelScope, SharingStarted.Lazily, "")
@@ -78,6 +91,13 @@ internal class ProfileViewModel @Inject constructor(
     fun unCheckDay(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             profileUserCase.unCheckDay(name = name)
+        }
+    }
+
+
+    fun checkTheme(name: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            profileUserCase.checkTheme(name = name)
         }
     }
 }

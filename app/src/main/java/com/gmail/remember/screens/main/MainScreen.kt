@@ -1,13 +1,14 @@
 package com.gmail.remember.screens.main
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -37,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -53,9 +54,12 @@ import com.gmail.remember.common.components.ItemBrainCard
 import com.gmail.remember.common.components.OutlineTextField
 import com.gmail.remember.navigation.Screens
 import com.gmail.remember.navigation.navigateSafeArgs
-import com.gmail.remember.ui.theme.GrayBlack
+import com.gmail.remember.ui.theme.BlackBrown
+import com.gmail.remember.ui.theme.GraphiteBlack
+import com.gmail.remember.ui.theme.GrayishOrange
+import com.gmail.remember.ui.theme.UmberGray
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MainScreen(
     navController: NavHostController,
@@ -75,63 +79,73 @@ internal fun MainScreen(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.Black),
+            .background(color = GraphiteBlack),
         topBar = {
-            TopAppBar(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                colors = TopAppBarDefaults
-                    .centerAlignedTopAppBarColors(
-                        containerColor = Color.Black,
-                        titleContentColor = Color.White
-                    ),
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(
-                                id = R.string.themes
+            Column {
+                TopAppBar(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    colors = TopAppBarDefaults
+                        .centerAlignedTopAppBarColors(
+                            containerColor = GraphiteBlack,
+                            titleContentColor = GrayishOrange
+                        ),
+                    title = {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(
+                                    id = R.string.themes
+                                )
                             )
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        modifier = Modifier.padding(end = 10.dp),
-                        onClick = {
-                            navController.navigate(Screens.ProfileScreen.route)
                         }
-                    ) {
-                        AsyncImage(
-                            modifier = Modifier
-                                .size(56.dp)
-                                .clip(CircleShape),
-                            model = photoUrl,
-                            contentDescription = "Settings"
-                        )
+                    },
+                    navigationIcon = {
+                        Spacer(modifier = Modifier.size(56.0.dp))
+                    },
+                    actions = {
+                        IconButton(
+                            modifier = Modifier.padding(end = 10.dp),
+                            onClick = {
+                                navController.navigate(Screens.ProfileScreen.route)
+                            }
+                        ) {
+                            AsyncImage(
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .clip(CircleShape),
+                                model = photoUrl,
+                                contentDescription = "Settings"
+                            )
+                        }
                     }
-                }
-            )
+                )
+                Divider(
+                    thickness = 0.5.dp,
+                    color = UmberGray
+                )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
-                containerColor = Color.White,
+                containerColor = GrayishOrange,
                 onClick = {
                     viewModel.showDialog()
                 }) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    tint = Color.Black,
+                    tint = BlackBrown,
                     contentDescription = "Add"
                 )
             }
         }
     ) { paddingValues ->
+
         LazyVerticalGrid(
             modifier = Modifier
-                .background(color = Color.Black)
+                .background(color = GraphiteBlack)
                 .fillMaxSize()
                 .padding(paddingValues),
             contentPadding = PaddingValues(10.dp),
@@ -145,6 +159,11 @@ internal fun MainScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
+                    Spacer(modifier = Modifier
+                        .height(8.dp)
+                        .fillMaxWidth()
+                        .background(color = GraphiteBlack)
+                    )
                     ItemBrainCard(
                         progress = section.progress,
                         onClick = {
@@ -157,12 +176,17 @@ internal fun MainScreen(
                             viewModel.deleteSection(name = section.name)
                         }
                     )
-                    Text(text = section.name.uppercase(), color = Color.White)
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = section.name.uppercase(),
+                        color = GrayishOrange
+                    )
                 }
             }
         }
 
         if (showDialog) AlertDialog(
+            modifier = Modifier.clip(shape = ShapeDefaults.Medium),
             onDismissRequest = {
                 viewModel.dismissDialog()
             },
@@ -187,7 +211,7 @@ internal fun MainScreen(
                             Icon(
                                 imageVector = Icons.Default.Clear,
                                 contentDescription = "Clear",
-                                tint = Color.White
+                                tint = GrayishOrange.copy(alpha = 0.32f)
                             )
                         }
                     }
@@ -198,21 +222,20 @@ internal fun MainScreen(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = name.isNotEmpty(),
                     onClick = {
-                        viewModel.addSection(name)
+                        viewModel.addSection(name, themes)
                         viewModel.dismissDialog()
                         focusManager.clearFocus()
-                    },
-                    containerColor = Color.Black.copy(alpha = 0.32f)
+                    }
                 ) {
                     Text(
                         modifier = Modifier.padding(10.dp),
-                        text = stringResource(R.string.add_button)
+                        text = stringResource(R.string.add_button),
                     )
                 }
             },
-            containerColor = GrayBlack,
-            textContentColor = GrayBlack,
-            shape = ShapeDefaults.Large,
+            containerColor = GraphiteBlack,
+            textContentColor = GrayishOrange,
+            shape = ShapeDefaults.Medium,
         )
     }
 }
