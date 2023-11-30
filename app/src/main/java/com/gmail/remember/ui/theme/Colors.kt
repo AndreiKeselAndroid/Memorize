@@ -10,8 +10,10 @@ internal val BlueGray = Color(0xFFCFD8DC)
 internal val BlueGrayTwo = Color(0xFFE0E5E7)
 
 internal val GrayBlackTwo = Color(0xFF1F1E1E)
+
+internal val Blue = Color(0xFF0FAFF0)
 internal val White
-    @Composable get() = if (isSystemInDarkTheme())Color(0xFFFEFEFE) else GrayBlackTwo
+    @Composable get() = if (isSystemInDarkTheme()) Color(0xFFFEFEFE) else GrayBlackTwo
 internal val GraphiteBlack
     @Composable get() = if (isSystemInDarkTheme()) Color(0xFF1F1C17) else BlueGray
 internal val BlackBrown

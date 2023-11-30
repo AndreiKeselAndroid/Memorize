@@ -7,8 +7,10 @@ import com.gmail.remember.domain.usercases.ProfileUserCase
 import com.gmail.remember.models.ThemeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -16,10 +18,17 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+const val DEFAULT_COUNT_THEMES = 1
 @HiltViewModel
 internal class ProfileViewModel @Inject constructor(
     private val profileUserCase: ProfileUserCase,
 ) : ViewModel() {
+
+    private val _countThemes: MutableStateFlow<Int> = MutableStateFlow(DEFAULT_COUNT_THEMES)
+    val countThemes: StateFlow<Int> = _countThemes.asStateFlow()
+
+    private val _isShowAllThemes: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isShowAllThemes: StateFlow<Boolean> = _isShowAllThemes.asStateFlow()
 
     val checkedAllDays: StateFlow<Boolean> by lazy {
         profileUserCase.settingsProfile.map { model ->
@@ -30,11 +39,11 @@ internal class ProfileViewModel @Inject constructor(
     }
 
     val themes: StateFlow<List<ThemeModel>> =
-        profileUserCase.themes.combine(profileUserCase.settingsProfile){themes,profile->
-            themes.map {model->
-               model.copy(
-                isChecked = model.name == profile.theme
-               )
+        profileUserCase.themes.combine(profileUserCase.settingsProfile) { themes, profile ->
+            themes.map { model ->
+                model.copy(
+                    isChecked = model.name == profile.theme
+                )
             }
         }
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
@@ -95,9 +104,16 @@ internal class ProfileViewModel @Inject constructor(
     }
 
 
-    fun checkTheme(name: String){
+    fun checkTheme(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             profileUserCase.checkTheme(name = name)
+        }
+    }
+
+    fun setCountThemes(count: Int, isShowAllThemes: Boolean) {
+        viewModelScope.launch {
+            _isShowAllThemes.emit(isShowAllThemes.not())
+            _countThemes.emit(count)
         }
     }
 }

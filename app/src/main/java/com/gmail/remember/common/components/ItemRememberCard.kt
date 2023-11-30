@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.gmail.remember.R
 import com.gmail.remember.models.WordModel
 import com.gmail.remember.ui.theme.BlackBrown
-import com.gmail.remember.ui.theme.White
+import com.gmail.remember.ui.theme.GrayishOrange
 import com.gmail.remember.utils.toBrushHorizontal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -124,7 +124,7 @@ fun ItemRememberCard(
                 text = if (isEnglish) model.wordEng.uppercase()
                 else model.wordRu.uppercase(),
                 fontWeight = FontWeight.Bold,
-                color = White,
+                color = GrayishOrange,
                 overflow = TextOverflow.Ellipsis,
             )
 
@@ -133,7 +133,7 @@ fun ItemRememberCard(
                     .graphicsLayer { rotationX = angle }
                     .padding(end = 16.dp),
                 painter = painterResource(id = R.drawable.ic_check),
-                colorFilter = ColorFilter.tint(White),
+                colorFilter = ColorFilter.tint(GrayishOrange),
                 contentDescription = "Check"
             )
         }

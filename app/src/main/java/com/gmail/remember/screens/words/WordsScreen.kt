@@ -43,7 +43,6 @@ import com.gmail.remember.navigation.navigateSafeArgs
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
 import com.gmail.remember.ui.theme.UmberGray
-import com.gmail.remember.ui.theme.White
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,7 +116,7 @@ internal fun WordsScreen(
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_check),
-                                tint = White,
+                                tint = GrayishOrange,
                                 contentDescription = "Check"
                             )
                         }
@@ -161,7 +160,7 @@ internal fun WordsScreen(
             contentPadding = PaddingValues(8.dp),
 
             ) {
-            items(words) { word ->
+            items(words, key = {model-> model?.wordEng ?: ""}) { word ->
                 ItemRememberCard(
                     model = word ?: WordModel(),
                     countSuccess = countSuccess,

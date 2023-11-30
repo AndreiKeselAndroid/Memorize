@@ -154,17 +154,22 @@ internal fun MainScreen(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 
-            items(themes) { section ->
+            items(themes, key = { model ->
+                model.name
+            }) { section ->
                 Column(
+                    modifier = Modifier.background(GraphiteBlack),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Spacer(modifier = Modifier
-                        .height(8.dp)
-                        .fillMaxWidth()
-                        .background(color = GraphiteBlack)
+                    Spacer(
+                        modifier = Modifier
+                            .height(8.dp)
+                            .fillMaxWidth()
+                            .background(color = GraphiteBlack)
                     )
                     ItemBrainCard(
+                        name = section.name,
                         progress = section.progress,
                         onClick = {
                             navController.navigateSafeArgs(

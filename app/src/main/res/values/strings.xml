@@ -19,4 +19,6 @@
     <string name="enter_answer">Введите ответ</string>
     <string name="right">Верно</string>
     <string name="wrong">Неверно</string>
+    <string name="hide">Скрыть</string>
+    <string name="all">Все\n</string>
 </resources>
