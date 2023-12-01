@@ -43,7 +43,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -156,9 +158,10 @@ internal fun MainScreen(
 
             items(themes, key = { model ->
                 model.name
-            }) { section ->
+            }) { theme ->
                 Column(
-                    modifier = Modifier.background(GraphiteBlack),
+                    modifier = Modifier
+                        .background(GraphiteBlack),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -169,21 +172,24 @@ internal fun MainScreen(
                             .background(color = GraphiteBlack)
                     )
                     ItemBrainCard(
-                        name = section.name,
-                        progress = section.progress,
+                        themeModel = theme,
+                        progress = theme.progress,
                         onClick = {
                             navController.navigateSafeArgs(
                                 Screens.WordsScreen.route,
-                                section.name
+                                theme.name
                             )
                         },
                         onLongClick = {
-                            viewModel.deleteSection(name = section.name)
+                            viewModel.deleteSection(name = theme.name)
                         }
                     )
                     Text(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = section.name.uppercase(),
+                        modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp),
+                        text = "${(theme.progress * 100).toInt().toString().uppercase()}% ${theme.name.uppercase()}",
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        fontWeight = FontWeight.Bold,
                         color = GrayishOrange
                     )
                 }

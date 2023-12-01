@@ -4,22 +4,20 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
+internal val Green = Color(0xFF34A853)
 
-internal val BlueGray = Color(0xFFCFD8DC)
+internal val Blue = Color(0xFFA9D7E4)
 
-internal val BlueGrayTwo = Color(0xFFE0E5E7)
+internal val Braun = Color(0xFFEA8068)
 
-internal val GrayBlackTwo = Color(0xFF1F1E1E)
-
-internal val Blue = Color(0xFF0FAFF0)
+internal val Yellow = Color(0xFFFCC934)
 internal val White
-    @Composable get() = if (isSystemInDarkTheme()) Color(0xFFFEFEFE) else GrayBlackTwo
+    @Composable get() = if (isSystemInDarkTheme()) Color(0xFFFFFBF8) else Color(0xFF342F2B)
 internal val GraphiteBlack
-    @Composable get() = if (isSystemInDarkTheme()) Color(0xFF1F1C17) else BlueGray
+    @Composable get() = if (isSystemInDarkTheme()) Color(0xFF1F1C17) else Color(0xFFF2EADF)
 internal val BlackBrown
-    @Composable get() = if (isSystemInDarkTheme()) Color(0xFF292421) else BlueGrayTwo
+    @Composable get() = if (isSystemInDarkTheme()) Color(0xFF292421) else Color(0xFFFFFBF8)
 internal val UmberGray
-    @Composable get() = if (isSystemInDarkTheme()) Color(0xFF342F2B) else BlueGrayTwo
-
+    @Composable get() = if (isSystemInDarkTheme()) Color(0xFF342F2B) else Color(0xFFFFFBF8)
 internal val GrayishOrange
-    @Composable get() = if (isSystemInDarkTheme()) Color(0xFFC0A78B) else GrayBlackTwo
+    @Composable get() = if (isSystemInDarkTheme()) Color(0xFFC0A78B) else Color(0xFF292421)

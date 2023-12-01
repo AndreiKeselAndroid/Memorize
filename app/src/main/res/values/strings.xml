@@ -14,11 +14,10 @@
     <string name="on_notifications">Заучивать слова</string>
     <string name="all_days">Все дни недели</string>
     <string name="answer">Ответить</string>
-    <string name="more">Еще</string>
+    <string name="more">Ещё</string>
     <string name="correct_answer">%1$s! Правильный ответ %2$s</string>
     <string name="enter_answer">Введите ответ</string>
     <string name="right">Верно</string>
     <string name="wrong">Неверно</string>
     <string name="hide">Скрыть</string>
-    <string name="all">Все\n</string>
 </resources>

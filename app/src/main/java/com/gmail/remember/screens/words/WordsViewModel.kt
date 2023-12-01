@@ -1,5 +1,6 @@
 package com.gmail.remember.screens.words
 
+import android.media.MediaPlayer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,6 +28,8 @@ internal class WordsViewModel @Inject constructor(
     private val rememberUserCase: WordsUserCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    val mediaPlayer: MediaPlayer = MediaPlayer()
 
     val countSuccess: StateFlow<Int> by lazy {
         rememberUserCase.settingsProfile.map { model ->

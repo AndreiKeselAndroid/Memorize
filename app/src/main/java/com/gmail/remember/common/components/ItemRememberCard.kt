@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.gmail.remember.R
 import com.gmail.remember.models.WordModel
 import com.gmail.remember.ui.theme.BlackBrown
-import com.gmail.remember.ui.theme.GrayishOrange
+import com.gmail.remember.ui.theme.White
 import com.gmail.remember.utils.toBrushHorizontal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,6 +52,7 @@ fun ItemRememberCard(
     model: WordModel = WordModel(),
     countSuccess: Int = 5,
     enableMultiSelect: Boolean = false,
+    mediaPlayer: MediaPlayer,
     onLongClick: (WordModel) -> Unit = {},
     onClick: (WordModel) -> Unit = {}
 ) {
@@ -66,7 +67,7 @@ fun ItemRememberCard(
     ) { values ->
         isEnglish = values == 180f
         if (isEnglish && model.url.isNotEmpty()) scope.launch(Dispatchers.IO) {
-            MediaPlayer().apply {
+            mediaPlayer.apply {
                 reset()
                 setDataSource(applicationContext, Uri.parse(model.url))
                 prepare()
@@ -124,7 +125,7 @@ fun ItemRememberCard(
                 text = if (isEnglish) model.wordEng.uppercase()
                 else model.wordRu.uppercase(),
                 fontWeight = FontWeight.Bold,
-                color = GrayishOrange,
+                color = White,
                 overflow = TextOverflow.Ellipsis,
             )
 
@@ -133,7 +134,7 @@ fun ItemRememberCard(
                     .graphicsLayer { rotationX = angle }
                     .padding(end = 16.dp),
                 painter = painterResource(id = R.drawable.ic_check),
-                colorFilter = ColorFilter.tint(GrayishOrange),
+                colorFilter = ColorFilter.tint(White),
                 contentDescription = "Check"
             )
         }

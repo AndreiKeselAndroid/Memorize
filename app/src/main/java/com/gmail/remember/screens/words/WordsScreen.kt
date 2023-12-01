@@ -165,6 +165,7 @@ internal fun WordsScreen(
                     model = word ?: WordModel(),
                     countSuccess = countSuccess,
                     enableMultiSelect = selectedWords.isNotEmpty(),
+                    mediaPlayer = viewModel :: mediaPlayer.get(),
                     onLongClick = { model ->
                         viewModel.enableMultiSelect(
                             word = model,

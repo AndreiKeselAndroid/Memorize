@@ -244,10 +244,9 @@ internal fun ProfileScreen(
                                         },
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = rememberRipple(color = GraphiteBlack.copy(alpha = 0.32f))
-                                    )
-                                    .padding(vertical = 8.dp),
+                                    ),
                                 text = if (isShowAllThemes) stringResource(R.string.hide) else stringResource(
-                                    R.string.all
+                                    R.string.more
                                 ),
                                 fontWeight = FontWeight.Normal,
                                 textAlign = TextAlign.End,

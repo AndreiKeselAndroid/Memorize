@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -28,7 +29,13 @@ class MainViewModel @Inject constructor(
     val name: StateFlow<String> = _name.asStateFlow()
 
     val themes: StateFlow<List<ThemeModel>> by lazy {
-        mainUserCase.themes
+        mainUserCase.themes.combine(mainUserCase.settingsProfile) { themes, profile ->
+            themes.map { model ->
+                model.copy(
+                    isChecked = model.name == profile.theme
+                )
+            }
+        }
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     }
 
