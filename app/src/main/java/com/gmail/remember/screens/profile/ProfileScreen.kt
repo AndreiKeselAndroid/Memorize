@@ -1,11 +1,14 @@
 package com.gmail.remember.screens.profile
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,13 +28,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -42,6 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.gmail.remember.R
 import com.gmail.remember.common.components.CheckBox
+import com.gmail.remember.common.components.OutlineTextField
 import com.gmail.remember.common.components.RadioButton
 import com.gmail.remember.common.components.Switch
 import com.gmail.remember.ui.theme.BlackBrown
@@ -51,6 +59,7 @@ import java.util.Locale
 
 const val ACTION_START_ALARM = "ACTION_START_ALARM"
 
+@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProfileScreen(
@@ -63,6 +72,12 @@ internal fun ProfileScreen(
     val themes by viewModel.themes.collectAsState()
     val countThemes by viewModel.countThemes.collectAsState()
     val isShowAllThemes by viewModel.isShowAllThemes.collectAsState()
+    val timeFrom by viewModel.timeFrom.collectAsState()
+    val timeTo by viewModel.timeTo.collectAsState()
+    val expandTimeFrom by viewModel.expandTimeFrom.collectAsState()
+    val expandTimeTo by viewModel.expandTimeTo.collectAsState()
+    val listTimeFrom by viewModel.listTimeFrom.collectAsState()
+    val listTimeTo by viewModel.listTimeTo.collectAsState()
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
@@ -75,8 +90,8 @@ internal fun ProfileScreen(
                     .background(color = GraphiteBlack)
                     .clip(
                         RoundedCornerShape(
-                            bottomEnd = 24.dp,
-                            bottomStart = 24.dp
+                            bottomEnd = if (scrollState.value != 0) 0.dp else 24.dp,
+                            bottomStart = if (scrollState.value != 0) 0.dp else 24.dp
                         )
                     )
                     .fillMaxWidth(),
@@ -123,7 +138,7 @@ internal fun ProfileScreen(
 
             Column(
                 modifier = Modifier
-                    .padding(top = 16.dp, start = 4.dp, end = 4.dp)
+                    .padding(top = 16.dp)
                     .clip(
                         RoundedCornerShape(
                             topStart = 24.dp,
@@ -169,7 +184,106 @@ internal fun ProfileScreen(
             }
 
             AnimatedVisibility(
-                modifier = Modifier.padding(start = 4.dp, end = 4.dp),
+                visible = isRemember
+            ) {
+                Column(
+                    modifier = Modifier
+                        .background(color = BlackBrown.copy(alpha = 0.5f))
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(16.dp),
+                        text = stringResource(id = R.string.time),
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center,
+                        fontSize = 18.sp,
+                        lineHeight = 24.sp,
+                        color = GrayishOrange
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CompositionLocalProvider(
+                            LocalTextInputService provides null
+                        ) {
+                            OutlineTextField(
+                                listTime = listTimeFrom,
+                                modifier = Modifier
+                                    .clickable {
+                                        viewModel.expandTimeFrom()
+                                    }
+                                    .padding(horizontal = 12.dp)
+                                    .weight(1f),
+                                onDismissDropdownMenu = {
+                                    viewModel.hideTimeFrom()
+                                },
+                                enabled = false,
+                                expandTime = mutableStateOf(expandTimeFrom),
+                                onClickItemMenu = { time ->
+                                    viewModel.setTimeFrom(time = time)
+                                    viewModel.hideTimeFrom()
+                                },
+                                trailingIcon = {
+                                    Icon(
+                                        painter = painterResource(
+                                            if (expandTimeFrom) R.drawable.ic_expand
+                                            else R.drawable.ic_not_expand
+                                        ),
+                                        contentDescription = "Calendar",
+                                        tint = GrayishOrange.copy(alpha = 0.32f)
+                                    )
+                                },
+                                value = timeFrom.time
+                            )
+                        }
+
+                        CompositionLocalProvider(
+                            LocalTextInputService provides null
+                        ) {
+                            OutlineTextField(
+                                listTime = listTimeTo,
+                                modifier = Modifier
+                                    .clickable {
+                                        viewModel.expandTimeTo()
+                                    }
+                                    .padding(horizontal = 12.dp)
+                                    .weight(1f),
+                                onDismissDropdownMenu = {
+                                    viewModel.hideTimeTo()
+                                },
+                                enabled = false,
+                                expandTime = mutableStateOf(expandTimeTo),
+                                onClickItemMenu = { time ->
+                                    viewModel.setTimeTo(time = time)
+                                    viewModel.hideTimeTo()
+                                },
+                                trailingIcon = {
+                                    Icon(
+                                        painter = painterResource(
+                                            if (expandTimeTo) R.drawable.ic_expand
+                                            else R.drawable.ic_not_expand
+                                        ),
+                                        contentDescription = "Calendar",
+                                        tint = GrayishOrange.copy(alpha = 0.32f),
+                                    )
+                                },
+                                value = timeTo.time,
+                            )
+                        }
+                    }
+
+                    Divider(
+                        modifier = Modifier.padding(top = 24.dp),
+                        color = BlackBrown
+                    )
+                }
+            }
+
+            AnimatedVisibility(
                 visible = isRemember
             ) {
                 Column(

@@ -46,4 +46,12 @@ internal class ProfileUserCaseImpl @Inject constructor(
     override suspend fun checkTheme(name: String) {
         rememberRepository.checkTheme(name = name)
     }
+
+    override suspend fun setTimeFrom(time: String) {
+        rememberRepository.setTimeFrom(time = time)
+    }
+
+    override suspend fun setTimeTo(time: String) {
+        rememberRepository.setTimeTo(time = time)
+    }
 }

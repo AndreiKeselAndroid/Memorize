@@ -39,6 +39,10 @@ fun RadioButton(
     Row(
         modifier = modifier
             .selectable(
+                indication = null,
+                interactionSource = remember {
+                    MutableInteractionSource()
+                },
                 selected = checked,
                 onClick = {
                     onCheckedChange(

@@ -18,4 +18,6 @@ interface ProfileUserCase {
     suspend fun unCheckAllDays()
     suspend fun checkAllDays()
     suspend fun checkTheme(name: String)
+    suspend fun setTimeFrom(time: String)
+    suspend fun setTimeTo(time: String)
 }

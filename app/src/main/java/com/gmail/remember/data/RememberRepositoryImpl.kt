@@ -49,6 +49,8 @@ private const val IS_REMEMBER = "remember"
 private const val DAYS = "days"
 private const val CHECK_DAY = "check"
 private const val THEME = "theme"
+private const val TIME_FROM = "timeFrom"
+private const val TIME_TO = "timeTo"
 
 internal class RememberRepositoryImpl @Inject constructor(
     private val serviceCreator: ServiceCreator
@@ -58,7 +60,8 @@ internal class RememberRepositoryImpl @Inject constructor(
     override val settingsProfile: Flow<ProfileSettingsModel>
         get() = dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE).snapshots.map { data ->
-                data.getValue(ProfileSettingsModel::class.java)?.decrypt() ?: ProfileSettingsModel().decrypt()
+                data.getValue(ProfileSettingsModel::class.java)?.decrypt()
+                    ?: ProfileSettingsModel().decrypt()
             }
 
             .flowOn(Dispatchers.IO)
@@ -268,5 +271,19 @@ internal class RememberRepositoryImpl @Inject constructor(
             .child(PROFILE)
             .child(THEME)
             .setValue(name.encrypt())
+    }
+
+    override suspend fun setTimeFrom(time: String) {
+        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+            .child(PROFILE)
+            .child(TIME_FROM)
+            .setValue(time.encrypt())
+    }
+
+    override suspend fun setTimeTo(time: String) {
+        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+            .child(PROFILE)
+            .child(TIME_TO)
+            .setValue(time.encrypt())
     }
 }

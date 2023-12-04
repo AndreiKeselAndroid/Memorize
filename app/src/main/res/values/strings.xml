@@ -2,6 +2,7 @@
     <string name="app_name">Запоминалка</string>
     <string name="words">Слова</string>
     <string name="themes">Темы</string>
+    <string name="time">Время</string>
     <string name="add">Добавить слово</string>
     <string name="chose_google_account">Выбрать Google аккаунт для входа</string>
     <string name="english">English</string>

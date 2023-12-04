@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,6 +31,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -75,6 +77,7 @@ internal fun MainScreen(
     val displayMetrics = LocalContext.current.resources.displayMetrics
     val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
     val countColumn by remember { mutableStateOf((screenWidthDp / 200f + 0.5).toInt()) }
+    val state = rememberLazyGridState()
 
     Scaffold(
         modifier = Modifier
@@ -86,8 +89,19 @@ internal fun MainScreen(
                     .background(color = GraphiteBlack)
                     .clip(
                         RoundedCornerShape(
-                            bottomEnd = 24.dp,
-                            bottomStart = 24.dp
+                            bottomEnd = if (
+                                remember {
+                                    derivedStateOf {
+                                        state.firstVisibleItemScrollOffset
+                                    }
+                                }.value != 0) 0.dp else 24.dp,
+                            bottomStart = if (
+                                remember {
+                                    derivedStateOf {
+                                        state.firstVisibleItemScrollOffset
+                                    }
+                                }.value != 0) 0.dp
+                            else 24.dp
                         )
                     )
                     .fillMaxWidth(),
@@ -146,11 +160,12 @@ internal fun MainScreen(
     ) { paddingValues ->
 
         LazyVerticalGrid(
+            state = state,
             modifier = Modifier
                 .background(color = GraphiteBlack)
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(start = 4.dp, end = 4.dp, bottom = 10.dp, top = 16.dp),
+            contentPadding = PaddingValues(bottom = 10.dp, top = 16.dp),
             columns = GridCells.Fixed(countColumn),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)

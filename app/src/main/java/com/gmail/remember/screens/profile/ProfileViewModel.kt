@@ -2,16 +2,20 @@ package com.gmail.remember.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gmail.remember.models.DayModel
+import com.gmail.remember.data.RememberData.listTime
 import com.gmail.remember.domain.usercases.ProfileUserCase
+import com.gmail.remember.models.DayModel
 import com.gmail.remember.models.ThemeModel
+import com.gmail.remember.models.TimeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -25,8 +29,16 @@ internal class ProfileViewModel @Inject constructor(
     private val profileUserCase: ProfileUserCase,
 ) : ViewModel() {
 
+    private val listTimes: MutableStateFlow<List<TimeModel>> = MutableStateFlow(listTime)
+
     private val _countThemes: MutableStateFlow<Int> = MutableStateFlow(DEFAULT_COUNT_THEMES)
     val countThemes: StateFlow<Int> = _countThemes.asStateFlow()
+
+    private val _expandTimeFrom: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val expandTimeFrom: StateFlow<Boolean> = _expandTimeFrom.asStateFlow()
+
+    private val _expandTimeTo: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val expandTimeTo: StateFlow<Boolean> = _expandTimeTo.asStateFlow()
 
     private val _isShowAllThemes: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isShowAllThemes: StateFlow<Boolean> = _isShowAllThemes.asStateFlow()
@@ -39,7 +51,7 @@ internal class ProfileViewModel @Inject constructor(
             .stateIn(viewModelScope, SharingStarted.Lazily, true)
     }
 
-    val themes: StateFlow<List<ThemeModel>> =
+    val themes: StateFlow<List<ThemeModel>> by lazy {
         profileUserCase.themes.combine(profileUserCase.settingsProfile) { themes, profile ->
             themes.map { model ->
                 model.copy(
@@ -47,7 +59,71 @@ internal class ProfileViewModel @Inject constructor(
                 )
             }
         }
+            .flowOn(Dispatchers.IO)
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    }
+
+    val timeFrom: StateFlow<TimeModel> by lazy {
+        profileUserCase.settingsProfile.map { profile ->
+            TimeModel(
+                id = profile.timeFrom.replaceAfter(":", "").trim(':').toInt(),
+                time = profile.timeFrom,
+                isCheck = true
+            )
+        }
+            .flowOn(Dispatchers.IO)
+            .stateIn(viewModelScope, SharingStarted.Lazily, TimeModel())
+    }
+
+
+    val timeTo: StateFlow<TimeModel> by lazy {
+        profileUserCase.settingsProfile.map { profile ->
+            TimeModel(
+                id = profile.timeTo.replaceAfter(":", "").trim(':').trim('0').toInt(),
+                time = profile.timeTo,
+                isCheck = true
+            )
+        }
+            .flowOn(Dispatchers.IO)
+            .stateIn(viewModelScope, SharingStarted.Lazily, TimeModel())
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val listTimeFrom: StateFlow<List<TimeModel>> by lazy {
+        timeTo.flatMapLatest { timeTo ->
+            listTimes.combine(timeFrom) { listTimes, timeFrom ->
+                listTimes.map { model ->
+                    model.copy(
+                        isCheck = timeFrom.id == model.id
+                    )
+                }.filter { model ->
+                    model.id < timeTo.id
+                }
+            }
+        }
+            .flowOn(Dispatchers.IO)
+            .stateIn(viewModelScope, SharingStarted.Lazily, listTime)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val listTimeTo: StateFlow<List<TimeModel>> by lazy {
+        timeFrom.flatMapLatest { timeFrom ->
+            listTimes.combine(timeTo) { listTimes, timeTo ->
+                listTimes.map { model ->
+                    model.copy(
+                        isCheck = timeTo.id == model.id
+                    )
+                }.filter { model ->
+                    model.id > timeFrom.id
+                }
+                    .sortedByDescending { model ->
+                        model.id
+                    }
+            }
+        }
+            .flowOn(Dispatchers.IO)
+            .stateIn(viewModelScope, SharingStarted.Lazily, listTime)
+    }
 
 
     val isRemember: StateFlow<Boolean> by lazy {
@@ -106,6 +182,42 @@ internal class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _isShowAllThemes.emit(isShowAllThemes.not())
             _countThemes.emit(count)
+        }
+    }
+
+    fun expandTimeFrom() {
+        viewModelScope.launch {
+            _expandTimeFrom.emit(true)
+        }
+    }
+
+    fun hideTimeFrom() {
+        viewModelScope.launch {
+            _expandTimeFrom.emit(false)
+        }
+    }
+
+    fun expandTimeTo() {
+        viewModelScope.launch {
+            _expandTimeTo.emit(true)
+        }
+    }
+
+    fun hideTimeTo() {
+        viewModelScope.launch {
+            _expandTimeTo.emit(false)
+        }
+    }
+
+    fun setTimeFrom(time: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            profileUserCase.setTimeFrom(time = time)
+        }
+    }
+
+    fun setTimeTo(time: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            profileUserCase.setTimeTo(time = time)
         }
     }
 }
