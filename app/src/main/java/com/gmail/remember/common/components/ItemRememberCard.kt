@@ -75,7 +75,7 @@ fun ItemRememberCard(
             }
         }
     }
-    val blackBrown: Color = BlackBrown
+    val blackBrown: Color = BlackBrown.copy(0.5f)
 
     Box(
         modifier = Modifier

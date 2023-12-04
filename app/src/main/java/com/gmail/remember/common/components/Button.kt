@@ -28,7 +28,7 @@ fun Button(
 ) {
     androidx.compose.material3.Button(
         modifier = modifier
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 4.dp)
             .fillMaxWidth(),
         enabled = enabled,
         elevation = ButtonDefaults.buttonElevation(

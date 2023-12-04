@@ -20,4 +20,5 @@
     <string name="right">Верно</string>
     <string name="wrong">Неверно</string>
     <string name="hide">Скрыть</string>
+    <string name="settings">Настройки</string>
 </resources>

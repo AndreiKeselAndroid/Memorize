@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 const val DEFAULT_COUNT_THEMES = 1
+
 @HiltViewModel
 internal class ProfileViewModel @Inject constructor(
     private val profileUserCase: ProfileUserCase,
@@ -65,15 +66,6 @@ internal class ProfileViewModel @Inject constructor(
         }
             .flowOn(Dispatchers.IO)
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-    }
-
-
-    val displayName: StateFlow<String> by lazy {
-        profileUserCase.settingsProfile.map { profile ->
-            profile.givenName ?: ""
-        }
-            .flowOn(Dispatchers.IO)
-            .stateIn(viewModelScope, SharingStarted.Lazily, "")
     }
 
     fun onCheckedChangeRemember(value: Boolean, unit: () -> Unit) {

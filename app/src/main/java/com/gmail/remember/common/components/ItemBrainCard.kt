@@ -7,6 +7,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Surface
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.unit.dp
 import com.gmail.remember.models.ThemeModel
+import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.utils.brainAnimate
 import com.gmail.remember.utils.drawBehind
@@ -42,8 +44,8 @@ fun ItemBrainCard(
 
     Surface(
         modifier = Modifier
-            .padding(2.dp)
-            .background(GraphiteBlack)
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
+            .background(BlackBrown.copy(0.5f))
             .combinedClickable(
                 interactionSource = remember {
                     MutableInteractionSource()
@@ -57,6 +59,8 @@ fun ItemBrainCard(
         Canvas(
             modifier = Modifier
                 .background(GraphiteBlack)
+                .background(BlackBrown.copy(0.5f))
+                .fillMaxSize()
                 .drawBehind {
                     drawBehind(
                         progress = progress,

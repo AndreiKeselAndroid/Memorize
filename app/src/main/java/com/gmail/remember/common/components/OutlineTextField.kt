@@ -45,7 +45,7 @@ fun OutlineTextField(
 
     OutlinedTextField(
         modifier = modifier
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 4.dp)
             .fillMaxWidth(),
         value = currentValue,
         onValueChange = { text -> onValueChange(text) },

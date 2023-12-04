@@ -28,6 +28,7 @@ import com.gmail.remember.ui.theme.GrayishOrange
 
 @Composable
 fun RadioButton(
+    modifier: Modifier = Modifier,
     checked: Boolean = false,
     onCheckedChange: (Boolean) -> Unit = {},
     checkedColor: Color = GrayishOrange,
@@ -36,7 +37,7 @@ fun RadioButton(
     textColor: Color = if (checked) GrayishOrange else GrayishOrange.copy(alpha = 0.32f)
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .selectable(
                 selected = checked,
                 onClick = {

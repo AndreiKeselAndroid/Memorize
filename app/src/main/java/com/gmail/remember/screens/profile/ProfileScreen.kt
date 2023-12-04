@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -17,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -59,7 +57,6 @@ internal fun ProfileScreen(
     navController: NavHostController,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val displayName by viewModel.displayName.collectAsState()
     val isRemember by viewModel.isRemember.collectAsState()
     val checkedAllDays by viewModel.checkedAllDays.collectAsState()
     val days by viewModel.days.collectAsState()
@@ -94,7 +91,7 @@ internal fun ProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = displayName,
+                            text = stringResource(R.string.settings),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -124,18 +121,25 @@ internal fun ProfileScreen(
                 .verticalScroll(scrollState)
         ) {
 
-            Spacer(
+            Column(
                 modifier = Modifier
-                    .height(10.dp)
-                    .fillMaxWidth()
-                    .background(color = GraphiteBlack)
-            )
+                    .padding(top = 16.dp, start = 4.dp, end = 4.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 24.dp,
+                            topEnd = 24.dp,
+                            bottomStart = if (!isRemember) 24.dp else 0.dp,
+                            bottomEnd = if (!isRemember) 24.dp else 0.dp
+                        )
+                    )
+                    .background(color = BlackBrown.copy(alpha = 0.5f))
+            ) {
 
-            Switch(
-                checked = isRemember,
-                text = R.string.on_notifications,
-                onCheckedChange = { value ->
-                    viewModel.onCheckedChangeRemember(value) {
+                Switch(
+                    checked = isRemember,
+                    text = R.string.on_notifications,
+                    onCheckedChange = { value ->
+                        viewModel.onCheckedChangeRemember(value) {
 //                        val alarmPendingIntent = PendingIntent.getBroadcast(
 //                            context,
 //                            0,
@@ -157,19 +161,26 @@ internal fun ProfileScreen(
 //                                cancel(alarmPendingIntent)
 //                            }
 //                        }
+                        }
                     }
-                }
-            )
+                )
 
-            Divider(
-                modifier = Modifier.padding(16.dp),
-                color = BlackBrown.copy(alpha = 0.62f)
-            )
+                if (isRemember) Divider(color = BlackBrown)
+            }
 
-            AnimatedVisibility(visible = isRemember) {
+            AnimatedVisibility(
+                modifier = Modifier.padding(start = 4.dp, end = 4.dp),
+                visible = isRemember
+            ) {
                 Column(
                     modifier = Modifier
-                        .background(color = GraphiteBlack)
+                        .clip(
+                            RoundedCornerShape(
+                                bottomStart = if (themes.isEmpty()) 24.dp else 0.dp,
+                                bottomEnd = if (themes.isEmpty()) 24.dp else 0.dp
+                            )
+                        )
+                        .background(color = BlackBrown.copy(alpha = 0.5f))
                         .fillMaxSize()
                 ) {
                     Switch(
@@ -181,14 +192,18 @@ internal fun ProfileScreen(
                         textColor = GrayishOrange
                     )
 
-                    AnimatedVisibility(visible = !checkedAllDays) {
+                    AnimatedVisibility(
+                        visible = !checkedAllDays
+                    ) {
                         Column(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .background(color = GraphiteBlack)
+                                .background(color = BlackBrown.copy(alpha = 0.5f))
                         ) {
-                            days.forEach { model ->
+                            days.forEachIndexed { index, model ->
                                 CheckBox(
+                                    modifier = Modifier.padding(bottom = if (index == 6 && themes.isEmpty()) 10.dp else 0.dp),
                                     checked = model.check,
                                     onCheckedChange = { value ->
                                         if (value) viewModel.checkDay(name = model.name)
@@ -199,14 +214,17 @@ internal fun ProfileScreen(
                             }
                         }
                     }
-                    Divider(
-                        modifier = Modifier.padding(16.dp),
-                        color = BlackBrown.copy(alpha = 0.62f)
+
+                    if (themes.isNotEmpty()) Divider(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        color = BlackBrown
                     )
 
                     if (themes.isNotEmpty()) Column(
                         modifier = Modifier
-                            .background(color = GraphiteBlack)
+                            .background(GraphiteBlack)
+                            .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                            .background(color = BlackBrown.copy(alpha = 0.5f))
                             .padding(horizontal = 16.dp)
                     ) {
                         Text(
@@ -222,6 +240,7 @@ internal fun ProfileScreen(
 
                         themes.forEachIndexed { index, model ->
                             if (index <= countThemes) RadioButton(
+                                modifier = Modifier.padding(bottom = if (themes.size in 1..2) 10.dp else 0.dp),
                                 checked = model.isChecked,
                                 onCheckedChange = {
                                     viewModel.checkTheme(model.name)
@@ -237,6 +256,7 @@ internal fun ProfileScreen(
                         if (themes.size > DEFAULT_COUNT_THEMES.plus(1)) {
                             Text(
                                 modifier = Modifier
+                                    .padding(bottom = 16.dp, start = 8.dp, end = 8.dp)
                                     .fillMaxWidth()
                                     .clickable(
                                         onClick = {
@@ -246,7 +266,7 @@ internal fun ProfileScreen(
                                             )
                                         },
                                         interactionSource = remember { MutableInteractionSource() },
-                                        indication = rememberRipple(color = GraphiteBlack.copy(alpha = 0.32f))
+                                        indication = null
                                     ),
                                 text = if (isShowAllThemes) stringResource(R.string.hide) else stringResource(
                                     R.string.more
@@ -258,11 +278,6 @@ internal fun ProfileScreen(
                                 color = GrayishOrange
                             )
                         }
-
-                        Divider(
-                            modifier = Modifier.padding(vertical = 16.dp),
-                            color = BlackBrown.copy(alpha = 0.62f)
-                        )
                     }
                 }
             }

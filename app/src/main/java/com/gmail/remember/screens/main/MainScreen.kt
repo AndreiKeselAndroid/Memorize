@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -82,54 +81,54 @@ internal fun MainScreen(
             .fillMaxSize()
             .background(color = GraphiteBlack),
         topBar = {
-                TopAppBar(
-                    modifier = Modifier
-                        .background(color = GraphiteBlack)
-                        .clip(
-                            RoundedCornerShape(
-                                bottomEnd = 24.dp,
-                                bottomStart = 24.dp
+            TopAppBar(
+                modifier = Modifier
+                    .background(color = GraphiteBlack)
+                    .clip(
+                        RoundedCornerShape(
+                            bottomEnd = 24.dp,
+                            bottomStart = 24.dp
+                        )
+                    )
+                    .fillMaxWidth(),
+                colors = TopAppBarDefaults
+                    .centerAlignedTopAppBarColors(
+                        containerColor = BlackBrown,
+                        titleContentColor = GrayishOrange
+                    ),
+                title = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(
+                                id = R.string.themes
                             )
                         )
-                        .fillMaxWidth(),
-                    colors = TopAppBarDefaults
-                        .centerAlignedTopAppBarColors(
-                            containerColor = BlackBrown,
-                            titleContentColor = GrayishOrange
-                        ),
-                    title = {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = stringResource(
-                                    id = R.string.themes
-                                )
-                            )
-                        }
-                    },
-                    navigationIcon = {
-                        Spacer(modifier = Modifier.size(56.0.dp))
-                    },
-                    actions = {
-                        IconButton(
-                            modifier = Modifier.padding(end = 10.dp),
-                            onClick = {
-                                navController.navigate(Screens.ProfileScreen.route)
-                            }
-                        ) {
-                            AsyncImage(
-                                modifier = Modifier
-                                    .size(56.dp)
-                                    .clip(CircleShape),
-                                model = photoUrl,
-                                contentDescription = "Settings"
-                            )
-                        }
                     }
-                )
+                },
+                navigationIcon = {
+                    Spacer(modifier = Modifier.size(56.0.dp))
+                },
+                actions = {
+                    IconButton(
+                        modifier = Modifier.padding(end = 10.dp),
+                        onClick = {
+                            navController.navigate(Screens.ProfileScreen.route)
+                        }
+                    ) {
+                        AsyncImage(
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(CircleShape),
+                            model = photoUrl,
+                            contentDescription = "Settings"
+                        )
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -151,7 +150,7 @@ internal fun MainScreen(
                 .background(color = GraphiteBlack)
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(10.dp),
+            contentPadding = PaddingValues(start = 4.dp, end = 4.dp, bottom = 10.dp, top = 16.dp),
             columns = GridCells.Fixed(countColumn),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -162,16 +161,11 @@ internal fun MainScreen(
             }) { theme ->
                 Column(
                     modifier = Modifier
-                        .background(GraphiteBlack),
+                        .clip(ShapeDefaults.Large)
+                        .background(BlackBrown.copy(0.5f)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Spacer(
-                        modifier = Modifier
-                            .height(8.dp)
-                            .fillMaxWidth()
-                            .background(color = GraphiteBlack)
-                    )
                     ItemBrainCard(
                         themeModel = theme,
                         progress = theme.progress,
@@ -186,10 +180,11 @@ internal fun MainScreen(
                         }
                     )
                     Text(
-                        modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp),
-                        text = "${
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        text = if (theme.progress > 0) "${
                             (theme.progress * 100).toInt().toString().uppercase()
-                        }% ${theme.name.uppercase()}",
+                        }% ${theme.name.uppercase()}"
+                        else theme.name.uppercase(),
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
                         fontWeight = FontWeight.Bold,
