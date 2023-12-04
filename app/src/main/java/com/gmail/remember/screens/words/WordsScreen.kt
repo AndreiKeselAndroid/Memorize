@@ -2,7 +2,6 @@ package com.gmail.remember.screens.words
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,12 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -30,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -40,9 +40,9 @@ import com.gmail.remember.common.components.ItemRememberCard
 import com.gmail.remember.models.WordModel
 import com.gmail.remember.navigation.Screens
 import com.gmail.remember.navigation.navigateSafeArgs
+import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
-import com.gmail.remember.ui.theme.UmberGray
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,73 +61,74 @@ internal fun WordsScreen(
             .fillMaxSize()
             .background(color = GraphiteBlack),
         topBar = {
-            Column {
-                TopAppBar(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = TopAppBarDefaults
-                        .centerAlignedTopAppBarColors(
-                            containerColor = GraphiteBlack,
-                            titleContentColor = GrayishOrange
-                        ),
-                    title = {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = if (selectedWords.isNotEmpty()) stringResource(
-                                    id = R.string.add_words
-                                ) else childName.replaceFirstChar { char ->
-                                    if (char.isLowerCase()) char.titlecase(
-                                        Locale.ROOT
-                                    ) else char.toString()
-                                }
-                            )
-                        }
-                    },
-                    navigationIcon = {
-                        if (selectedWords.isNotEmpty()) IconButton(onClick = {
-                            viewModel.disableMultiSelect()
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                tint = GrayishOrange,
-                                contentDescription = "exit"
-                            )
-                        } else
-                            IconButton(onClick = {
-                                navController.popBackStack()
+            TopAppBar(
+                modifier = Modifier
+                    .background(color = GraphiteBlack)
+                    .clip(
+                        RoundedCornerShape(
+                            bottomEnd = 24.dp,
+                            bottomStart = 24.dp
+                        )
+                    )
+                    .fillMaxWidth(),
+                colors = TopAppBarDefaults
+                    .centerAlignedTopAppBarColors(
+                        containerColor = BlackBrown,
+                        titleContentColor = GrayishOrange
+                    ),
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = if (selectedWords.isNotEmpty()) stringResource(
+                                id = R.string.add_words
+                            ) else childName.replaceFirstChar { char ->
+                                if (char.isLowerCase()) char.titlecase(
+                                    Locale.ROOT
+                                ) else char.toString()
                             }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowBack,
-                                    tint = GrayishOrange,
-                                    contentDescription = "BackIcon"
-                                )
-                            }
-                    },
-                    actions = {
-                        if (selectedWords.isNotEmpty()) IconButton(onClick = {
-                            viewModel.selectedAllHandler(
-                                allWords = words,
-                                selectedWords = selectedWords,
-                            )
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_check),
-                                tint = GrayishOrange,
-                                contentDescription = "Check"
-                            )
-                        }
-                        else Spacer(modifier = Modifier.size(40.0.dp))
+                        )
                     }
-                )
-                Divider(
-                    thickness = 0.5.dp,
-                    color = UmberGray
-                )
-            }
+                },
+                navigationIcon = {
+                    if (selectedWords.isNotEmpty()) IconButton(onClick = {
+                        viewModel.disableMultiSelect()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            tint = GrayishOrange,
+                            contentDescription = "exit"
+                        )
+                    } else
+                        IconButton(onClick = {
+                            navController.popBackStack()
+                        }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                tint = GrayishOrange,
+                                contentDescription = "BackIcon"
+                            )
+                        }
+                },
+                actions = {
+                    if (selectedWords.isNotEmpty()) IconButton(onClick = {
+                        viewModel.selectedAllHandler(
+                            allWords = words,
+                            selectedWords = selectedWords,
+                        )
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_check),
+                            tint = GrayishOrange,
+                            contentDescription = "Check"
+                        )
+                    }
+                    else Spacer(modifier = Modifier.size(40.0.dp))
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -160,12 +161,12 @@ internal fun WordsScreen(
             contentPadding = PaddingValues(8.dp),
 
             ) {
-            items(words, key = {model-> model?.wordEng ?: ""}) { word ->
+            items(words, key = { model -> model?.wordEng ?: "" }) { word ->
                 ItemRememberCard(
                     model = word ?: WordModel(),
                     countSuccess = countSuccess,
                     enableMultiSelect = selectedWords.isNotEmpty(),
-                    mediaPlayer = viewModel :: mediaPlayer.get(),
+                    mediaPlayer = viewModel::mediaPlayer.get(),
                     onLongClick = { model ->
                         viewModel.enableMultiSelect(
                             word = model,

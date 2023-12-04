@@ -42,7 +42,7 @@ fun ItemBrainCard(
 
     Surface(
         modifier = Modifier
-            .padding(4.dp)
+            .padding(2.dp)
             .background(GraphiteBlack)
             .combinedClickable(
                 interactionSource = remember {

@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GrayishOrange
-import com.gmail.remember.ui.theme.White
 
 @Composable
 fun Button(
@@ -21,8 +20,8 @@ fun Button(
     defaultElevation: Dp = 0.dp,
     onClick: () -> Unit = {},
     shape: CornerBasedShape = ShapeDefaults.Medium,
-    contentColor: Color = White,
-    containerColor: Color = BlackBrown,
+    contentColor: Color = BlackBrown,
+    containerColor: Color = GrayishOrange,
     disabledContentColor: Color = GrayishOrange.copy(alpha = 0.32f),
     disabledContainerColor: Color = containerColor.copy(alpha = 0.32f),
     content: @Composable () -> Unit = {}

@@ -15,11 +15,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -59,7 +59,6 @@ import com.gmail.remember.navigation.navigateSafeArgs
 import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
-import com.gmail.remember.ui.theme.UmberGray
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,18 +82,25 @@ internal fun MainScreen(
             .fillMaxSize()
             .background(color = GraphiteBlack),
         topBar = {
-            Column {
                 TopAppBar(
                     modifier = Modifier
+                        .background(color = GraphiteBlack)
+                        .clip(
+                            RoundedCornerShape(
+                                bottomEnd = 24.dp,
+                                bottomStart = 24.dp
+                            )
+                        )
                         .fillMaxWidth(),
                     colors = TopAppBarDefaults
                         .centerAlignedTopAppBarColors(
-                            containerColor = GraphiteBlack,
+                            containerColor = BlackBrown,
                             titleContentColor = GrayishOrange
                         ),
                     title = {
                         Box(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -124,11 +130,6 @@ internal fun MainScreen(
                         }
                     }
                 )
-                Divider(
-                    thickness = 0.5.dp,
-                    color = UmberGray
-                )
-            }
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -186,7 +187,9 @@ internal fun MainScreen(
                     )
                     Text(
                         modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp),
-                        text = "${(theme.progress * 100).toInt().toString().uppercase()}% ${theme.name.uppercase()}",
+                        text = "${
+                            (theme.progress * 100).toInt().toString().uppercase()
+                        }% ${theme.name.uppercase()}",
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
                         fontWeight = FontWeight.Bold,

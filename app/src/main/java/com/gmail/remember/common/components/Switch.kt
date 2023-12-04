@@ -21,20 +21,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
-import com.gmail.remember.ui.theme.UmberGray
 
 @Composable
 fun Switch(
     checked: Boolean = true,
     onCheckedChange: (Boolean) -> Unit = {},
     checkedThumbColor: Color = GrayishOrange,
-    checkedTrackColor: Color = UmberGray,
+    checkedTrackColor: Color = BlackBrown,
     uncheckedThumbColor: Color = GrayishOrange.copy(alpha = 0.32f),
-    uncheckedTrackColor: Color = UmberGray,
-    checkedBorderColor: Color = UmberGray,
-    uncheckedBorderColor: Color = UmberGray,
+    uncheckedTrackColor: Color = BlackBrown,
+    checkedBorderColor: Color = BlackBrown,
+    uncheckedBorderColor: Color = BlackBrown,
     @StringRes text: Int? = null,
     textColor: Color = if (checked) GrayishOrange else GrayishOrange.copy(alpha = 0.32f)
 ) {

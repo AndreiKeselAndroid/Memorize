@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +34,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -48,10 +49,9 @@ import androidx.navigation.NavHostController
 import com.gmail.remember.R
 import com.gmail.remember.common.components.Button
 import com.gmail.remember.common.components.OutlineTextField
+import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
-import com.gmail.remember.ui.theme.UmberGray
-import com.gmail.remember.ui.theme.White
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -80,6 +80,7 @@ internal fun AddWordsScreen(
 
     Scaffold(
         modifier = Modifier
+            .background(color = GraphiteBlack)
             .fillMaxSize()
             .imePadding()
             .pointerInput(Unit) {
@@ -88,50 +89,51 @@ internal fun AddWordsScreen(
                         focusManager.clearFocus()
                     }
                 )
-            }
-            .background(color = GraphiteBlack),
+            },
         topBar = {
-            Column {
-                TopAppBar(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = TopAppBarDefaults
-                        .centerAlignedTopAppBarColors(
-                            containerColor = GraphiteBlack,
-                            titleContentColor = GrayishOrange
-                        ),
-                    title = {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.add)
-                            )
-                        }
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            focusManager.clearFocus()
-                            navController.popBackStack()
-                        }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                tint = GrayishOrange,
-                                contentDescription = "BackIcon"
-                            )
-                        }
-                    },
-                    actions = {
-                        Spacer(modifier = Modifier.size(40.0.dp))
+            TopAppBar(
+                modifier = Modifier
+                    .background(color = GraphiteBlack)
+                    .clip(
+                        RoundedCornerShape(
+                            bottomEnd = 24.dp,
+                            bottomStart = 24.dp
+                        )
+                    )
+                    .fillMaxWidth(),
+                colors = TopAppBarDefaults
+                    .centerAlignedTopAppBarColors(
+                        containerColor = BlackBrown,
+                        titleContentColor = GrayishOrange
+                    ),
+                title = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.add)
+                        )
                     }
-                )
-                Divider(
-                    thickness = 0.5.dp,
-                    color = UmberGray
-                )
-            }
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        focusManager.clearFocus()
+                        navController.popBackStack()
+                    }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            tint = GrayishOrange,
+                            contentDescription = "BackIcon"
+                        )
+                    }
+                },
+                actions = {
+                    Spacer(modifier = Modifier.size(40.0.dp))
+                }
+            )
         },
         bottomBar = {
             Box(
@@ -168,7 +170,9 @@ internal fun AddWordsScreen(
             }
         },
         snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
+            SnackbarHost(
+                hostState = snackBarHostState
+            )
         },
     ) { paddingValues ->
         Column(
@@ -217,7 +221,7 @@ internal fun AddWordsScreen(
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear",
-                            tint = White.copy(alpha = 0.32f)
+                            tint = GraphiteBlack.copy(alpha = 0.32f)
                         )
                     }
                 }

@@ -30,9 +30,9 @@ fun CheckBox(
         .padding(top = 8.dp, bottom = 8.dp),
     checked: Boolean = false,
     onCheckedChange: (Boolean) -> Unit = {},
-    checkedColor: Color = GrayishOrange,
+    checkedColor: Color = GrayishOrange.copy(alpha = 0.32f),
     uncheckedColor: Color = GrayishOrange.copy(alpha = 0.32f),
-    checkmarkColor: Color = Color.White,
+    checkmarkColor: Color = GrayishOrange,
     text: String? = null,
     textColor: Color = if (checked) GrayishOrange else GrayishOrange.copy(alpha = 0.32f)
 ) {

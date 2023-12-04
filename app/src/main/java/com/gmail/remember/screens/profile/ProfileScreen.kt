@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -31,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,10 +46,9 @@ import com.gmail.remember.R
 import com.gmail.remember.common.components.CheckBox
 import com.gmail.remember.common.components.RadioButton
 import com.gmail.remember.common.components.Switch
+import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
-import com.gmail.remember.ui.theme.UmberGray
-import com.gmail.remember.ui.theme.White
 import java.util.Locale
 
 const val ACTION_START_ALARM = "ACTION_START_ALARM"
@@ -72,45 +73,47 @@ internal fun ProfileScreen(
         modifier = Modifier
             .background(color = GraphiteBlack),
         topBar = {
-            Column {
-                TopAppBar(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = TopAppBarDefaults
-                        .centerAlignedTopAppBarColors(
-                            containerColor = GraphiteBlack,
-                            titleContentColor = GrayishOrange
-                        ),
-                    title = {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = displayName,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                tint = GrayishOrange,
-                                contentDescription = "BackIcon"
-                            )
-                        }
-                    },
-                    actions = {
-                        Spacer(modifier = Modifier.size(40.0.dp))
+            TopAppBar(
+                modifier = Modifier
+                    .background(color = GraphiteBlack)
+                    .clip(
+                        RoundedCornerShape(
+                            bottomEnd = 24.dp,
+                            bottomStart = 24.dp
+                        )
+                    )
+                    .fillMaxWidth(),
+                colors = TopAppBarDefaults
+                    .centerAlignedTopAppBarColors(
+                        containerColor = BlackBrown,
+                        titleContentColor = GrayishOrange
+                    ),
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = displayName,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
-                )
-                Divider(
-                    thickness = 0.5.dp,
-                    color = UmberGray
-                )
-            }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            tint = GrayishOrange,
+                            contentDescription = "BackIcon"
+                        )
+                    }
+                },
+                actions = {
+                    Spacer(modifier = Modifier.size(40.0.dp))
+                }
+            )
+
         }
     ) { paddingValues ->
         Column(
@@ -160,7 +163,7 @@ internal fun ProfileScreen(
 
             Divider(
                 modifier = Modifier.padding(16.dp),
-                color = UmberGray
+                color = BlackBrown.copy(alpha = 0.62f)
             )
 
             AnimatedVisibility(visible = isRemember) {
@@ -198,7 +201,7 @@ internal fun ProfileScreen(
                     }
                     Divider(
                         modifier = Modifier.padding(16.dp),
-                        color = UmberGray
+                        color = BlackBrown.copy(alpha = 0.62f)
                     )
 
                     if (themes.isNotEmpty()) Column(
@@ -252,13 +255,13 @@ internal fun ProfileScreen(
                                 textAlign = TextAlign.End,
                                 fontSize = 14.sp,
                                 lineHeight = 24.sp,
-                                color = White
+                                color = GrayishOrange
                             )
                         }
 
                         Divider(
                             modifier = Modifier.padding(vertical = 16.dp),
-                            color = UmberGray
+                            color = BlackBrown.copy(alpha = 0.62f)
                         )
                     }
                 }

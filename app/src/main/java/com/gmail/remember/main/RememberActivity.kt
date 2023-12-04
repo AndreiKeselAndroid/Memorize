@@ -17,6 +17,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.gmail.remember.navigation.NavGraph
+import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.RememberTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -49,13 +50,14 @@ class RememberActivity : ComponentActivity() {
 
         setContent {
             val systemUiController = rememberSystemUiController()
+            val blackBrown = BlackBrown
             val graphiteBlack = GraphiteBlack
             val darkIcons = !isSystemInDarkTheme()
 
             SideEffect {
                 systemUiController.apply {
                     setStatusBarColor(
-                        color = graphiteBlack,
+                        color = blackBrown,
                         darkIcons = darkIcons
                     )
                     setNavigationBarColor(
