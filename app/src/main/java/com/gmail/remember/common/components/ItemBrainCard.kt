@@ -45,7 +45,7 @@ fun ItemBrainCard(
     Surface(
         modifier = Modifier
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
-            .background(BlackBrown.copy(0.5f))
+            .background(BlackBrown.copy(0.22f))
             .combinedClickable(
                 interactionSource = remember {
                     MutableInteractionSource()
@@ -59,7 +59,7 @@ fun ItemBrainCard(
         Canvas(
             modifier = Modifier
                 .background(GraphiteBlack)
-                .background(BlackBrown.copy(0.5f))
+                .background(BlackBrown.copy(0.22f))
                 .fillMaxSize()
                 .drawBehind {
                     drawBehind(

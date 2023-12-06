@@ -142,7 +142,7 @@ internal fun AddWordsScreen(
                     .fillMaxWidth()
             ) {
                 Button(
-                    modifier = Modifier.padding(bottom = 24.dp),
+                    modifier = Modifier.padding(bottom = 24.dp, start = 4.dp, end = 4.dp),
                     enabled = enableButton,
                     onClick = {
                         viewModel.clickAdd(
@@ -186,8 +186,7 @@ internal fun AddWordsScreen(
 
             OutlineTextField(
                 modifier = Modifier
-                    .padding(top = 8.dp)
-                    .padding(vertical = 8.dp)
+                    .padding(top = 12.dp, start = 4.dp, end = 4.dp)
                     .focusRequester(focusRequester),
                 value = enWord,
                 textLabel = stringResource(R.string.english),
@@ -208,6 +207,8 @@ internal fun AddWordsScreen(
             )
 
             OutlineTextField(
+                modifier = Modifier
+                    .padding(start = 4.dp, end = 4.dp),
                 value = ruWord,
                 imeAction = ImeAction.Go,
                 textLabel = stringResource(R.string.russian),

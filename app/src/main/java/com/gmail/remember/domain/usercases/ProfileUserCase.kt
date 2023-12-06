@@ -20,4 +20,6 @@ interface ProfileUserCase {
     suspend fun checkTheme(name: String)
     suspend fun setTimeFrom(time: String)
     suspend fun setTimeTo(time: String)
+    suspend fun setCount(count: String)
+    suspend fun changeCountInWords(count: String)
 }

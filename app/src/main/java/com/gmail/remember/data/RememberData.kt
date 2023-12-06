@@ -1,14 +1,33 @@
 package com.gmail.remember.data
 
+import com.gmail.remember.models.LevelModel
 import com.gmail.remember.models.TimeModel
 
 object RememberData {
+    val listLevels: List<LevelModel>
+        get() = listOf(
+            LevelModel(
+                id = 1,
+                name = "Легкий",
+                countSuccess = 1,
+                check = false
+            ),
+            LevelModel(
+                id = 3,
+                name = "Средний",
+                countSuccess = 3,
+                check = false
+            ),
+            LevelModel(
+                id = 5,
+                name = "Сложный",
+                countSuccess = 5,
+                check = false
+            )
+        )
+
     val listTime: List<TimeModel>
         get() = listOf(
-            TimeModel(
-                time = "00:00",
-                isCheck = false
-            ),
             TimeModel(
                 id = 1,
                 time = "01:00",

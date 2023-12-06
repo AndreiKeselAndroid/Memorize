@@ -2,11 +2,15 @@ package com.gmail.remember.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gmail.remember.data.RememberData.listLevels
 import com.gmail.remember.data.RememberData.listTime
 import com.gmail.remember.domain.usercases.ProfileUserCase
 import com.gmail.remember.models.DayModel
+import com.gmail.remember.models.LevelModel
+import com.gmail.remember.models.ProgressModel
 import com.gmail.remember.models.ThemeModel
 import com.gmail.remember.models.TimeModel
+import com.gmail.remember.models.WordModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,6 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -31,6 +36,8 @@ internal class ProfileViewModel @Inject constructor(
 
     private val listTimes: MutableStateFlow<List<TimeModel>> = MutableStateFlow(listTime)
 
+    private val _levels: MutableStateFlow<List<LevelModel>> = MutableStateFlow(listLevels)
+
     private val _countThemes: MutableStateFlow<Int> = MutableStateFlow(DEFAULT_COUNT_THEMES)
     val countThemes: StateFlow<Int> = _countThemes.asStateFlow()
 
@@ -39,6 +46,9 @@ internal class ProfileViewModel @Inject constructor(
 
     private val _expandTimeTo: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val expandTimeTo: StateFlow<Boolean> = _expandTimeTo.asStateFlow()
+
+    private val _expandLevels: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val expandLevels: StateFlow<Boolean> = _expandLevels.asStateFlow()
 
     private val _isShowAllThemes: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isShowAllThemes: StateFlow<Boolean> = _isShowAllThemes.asStateFlow()
@@ -63,6 +73,49 @@ internal class ProfileViewModel @Inject constructor(
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val progress: StateFlow<ProgressModel?> by lazy {
+        level.flatMapLatest { level ->
+            themes.flatMapLatest { themes ->
+                var countSuccess = 0
+                var countError = 0
+                var countLearnt = 0
+                try {
+                    val theme = themes.first { theme ->
+                        theme.isChecked
+                    }
+                    profileUserCase.words(
+                        theme.name
+                    ).map { snapshots ->
+                        snapshots.children.map { snapshot ->
+                            snapshot.getValue(WordModel::class.java)
+                        }.forEach { model ->
+                            countSuccess += model?.countSuccess ?: 0
+                            countError += model?.countError ?: 0
+                            if (model?.countSuccess == level.countSuccess)
+                                countLearnt += 1
+                        }
+                        ProgressModel(
+                            name = theme.name,
+                            progress = (theme.progress * 100).toInt(),
+                            countSuccess = countSuccess,
+                            countError = countError,
+                            countLearnt = countLearnt,
+                            size =  snapshots.children.map { snapshot ->
+                                snapshot.getValue(WordModel::class.java)
+                            }.size
+                        )
+                    }
+                } catch (e: Exception) {
+                    emptyFlow()
+                }
+            }
+        }
+            .flowOn(Dispatchers.IO)
+            .stateIn(viewModelScope, SharingStarted.Lazily, null)
+    }
+
+
     val timeFrom: StateFlow<TimeModel> by lazy {
         profileUserCase.settingsProfile.map { profile ->
             TimeModel(
@@ -79,7 +132,7 @@ internal class ProfileViewModel @Inject constructor(
     val timeTo: StateFlow<TimeModel> by lazy {
         profileUserCase.settingsProfile.map { profile ->
             TimeModel(
-                id = profile.timeTo.replaceAfter(":", "").trim(':').trim('0').toInt(),
+                id = profile.timeTo.replaceAfter(":", "").trim(':').toInt(),
                 time = profile.timeTo,
                 isCheck = true
             )
@@ -123,6 +176,32 @@ internal class ProfileViewModel @Inject constructor(
         }
             .flowOn(Dispatchers.IO)
             .stateIn(viewModelScope, SharingStarted.Lazily, listTime)
+    }
+
+    val levels: StateFlow<List<LevelModel>> by lazy {
+        _levels.combine(profileUserCase.settingsProfile) { levels, profile ->
+            levels.map { model ->
+                model.copy(
+                    check = model.countSuccess.toString() == profile.countSuccess
+                )
+            }
+        }
+            .flowOn(Dispatchers.IO)
+            .stateIn(viewModelScope, SharingStarted.Lazily, listLevels)
+    }
+
+    val level: StateFlow<LevelModel> by lazy {
+        profileUserCase.settingsProfile.combine(_levels) { profile, listLevels ->
+            try {
+                listLevels.first { model ->
+                    model.countSuccess.toString() == profile.countSuccess
+                }
+            } catch (e: Exception) {
+                LevelModel()
+            }
+        }
+            .flowOn(Dispatchers.IO)
+            .stateIn(viewModelScope, SharingStarted.Lazily, LevelModel())
     }
 
 
@@ -209,6 +288,18 @@ internal class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun expandLevels() {
+        viewModelScope.launch {
+            _expandLevels.emit(true)
+        }
+    }
+
+    fun hideLevels() {
+        viewModelScope.launch {
+            _expandLevels.emit(false)
+        }
+    }
+
     fun setTimeFrom(time: String) {
         viewModelScope.launch(Dispatchers.IO) {
             profileUserCase.setTimeFrom(time = time)
@@ -218,6 +309,25 @@ internal class ProfileViewModel @Inject constructor(
     fun setTimeTo(time: String) {
         viewModelScope.launch(Dispatchers.IO) {
             profileUserCase.setTimeTo(time = time)
+        }
+    }
+
+    fun setLevel(level: LevelModel?, currentLevel: LevelModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (level != null) {
+                when {
+                    level.id > currentLevel.id -> {
+                        profileUserCase.setCount(count = level.countSuccess.toString())
+                    }
+
+                    level.id < currentLevel.id -> {
+                        profileUserCase.setCount(count = level.countSuccess.toString())
+                        profileUserCase.changeCountInWords(count = level.countSuccess.toString())
+                    }
+
+                    else -> {}
+                }
+            }
         }
     }
 }

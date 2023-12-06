@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.gmail.remember.R
+import com.gmail.remember.models.LevelModel
 import com.gmail.remember.models.TimeModel
 import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
@@ -70,10 +71,10 @@ fun OutlineTextField(
     textColor: Color = GrayishOrange,
     cursorColor: Color = GrayishOrange,
     focusManager: FocusManager? = null,
-    listTime: List<TimeModel> = emptyList(),
+    list: List<Any> = emptyList(),
     expandTime: MutableState<Boolean> = mutableStateOf(false),
     onDismissDropdownMenu: () -> Unit = {},
-    onClickItemMenu: (String) -> Unit = {},
+    onClickItemMenu: (Any) -> Unit = {},
     enabled: Boolean = true
 ) {
 
@@ -134,7 +135,7 @@ fun OutlineTextField(
             ),
         )
 
-        if (listTime.isNotEmpty())
+        if (list.isNotEmpty())
             DropdownMenu(
                 modifier = Modifier
                     .background(GraphiteBlack)
@@ -148,31 +149,40 @@ fun OutlineTextField(
                     onDismissDropdownMenu()
                 },
             ) {
-                listTime.forEachIndexed { index, time ->
+                list.forEachIndexed { index, model ->
                     Column {
                         DropdownMenuItem(
                             onClick = {
                                 expanded = false
-                                onClickItemMenu(time.time)
+                                onClickItemMenu(model)
                             },
                             text = {
                                 Text(
                                     modifier = Modifier.fillMaxWidth(),
-                                    text = time.time,
+                                    text = when (model) {
+                                        is TimeModel -> model.time
+                                        is LevelModel -> model.name
+                                        else -> ""
+                                    },
                                     color = GrayishOrange,
                                     textAlign = TextAlign.Start,
                                     fontWeight = FontWeight.Normal
                                 )
                             },
                             trailingIcon = {
-                                if (time.isCheck) Image(
+                                if (when (model) {
+                                        is TimeModel -> model.isCheck
+                                        is LevelModel -> model.check
+                                        else -> false
+                                    }
+                                ) Image(
                                     painter = painterResource(id = R.drawable.ic_check),
                                     colorFilter = ColorFilter.tint(GrayishOrange),
                                     contentDescription = "Ok"
                                 )
                             }
                         )
-                        if (listTime.size.minus(1) != index)
+                        if (list.size.minus(1) != index)
                             Divider(
                                 modifier = Modifier
                                     .fillMaxWidth(),

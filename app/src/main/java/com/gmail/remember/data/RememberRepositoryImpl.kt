@@ -36,6 +36,7 @@ import com.google.firebase.database.snapshots
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -285,5 +286,40 @@ internal class RememberRepositoryImpl @Inject constructor(
             .child(PROFILE)
             .child(TIME_TO)
             .setValue(time.encrypt())
+    }
+
+    override suspend fun setCount(count: String) {
+        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+            .child(PROFILE)
+            .child(COUNT)
+            .setValue(count.encrypt())
+    }
+
+    override suspend fun changeCountInWords(count: String) {
+        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+            .child(THEMES)
+            .snapshots
+            .map { snapshots ->
+                snapshots.children.map { data ->
+                    data.children.map { children ->
+                        hashSetOf(data.key to children.getValue(WordModel::class.java)).toMap()
+                    }
+                }
+                    .flatten()
+            }
+            .collectLatest { result ->
+                result.forEach { map ->
+                    map.forEach { entry ->
+                        if (entry.key != null && entry.value != null && entry.value!!.countSuccess > 0 && entry.value!!.countSuccess != count.toInt()) {
+                            dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+                                .child(THEMES)
+                                .child(entry.key!!)
+                                .child(entry.value!!.wordEng)
+                                .child(COUNT)
+                                .setValue(count.toInt())
+                        }
+                    }
+                }
+            }
     }
 }

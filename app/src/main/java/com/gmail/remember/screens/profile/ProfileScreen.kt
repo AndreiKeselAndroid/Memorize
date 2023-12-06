@@ -1,6 +1,7 @@
 package com.gmail.remember.screens.profile
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -19,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -52,6 +55,9 @@ import com.gmail.remember.common.components.CheckBox
 import com.gmail.remember.common.components.OutlineTextField
 import com.gmail.remember.common.components.RadioButton
 import com.gmail.remember.common.components.Switch
+import com.gmail.remember.models.LevelModel
+import com.gmail.remember.models.TimeModel
+import com.gmail.remember.models.isShowProgress
 import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
@@ -78,8 +84,14 @@ internal fun ProfileScreen(
     val expandTimeTo by viewModel.expandTimeTo.collectAsState()
     val listTimeFrom by viewModel.listTimeFrom.collectAsState()
     val listTimeTo by viewModel.listTimeTo.collectAsState()
+    val levels by viewModel.levels.collectAsState()
+    val currentLevel by viewModel.level.collectAsState()
+    val expandLevels by viewModel.expandLevels.collectAsState()
+    val progress by viewModel.progress.collectAsState()
     val scrollState = rememberScrollState()
     val context = LocalContext.current
+
+    Log.e("KEK", progress.toString())
 
     Scaffold(
         modifier = Modifier
@@ -90,8 +102,8 @@ internal fun ProfileScreen(
                     .background(color = GraphiteBlack)
                     .clip(
                         RoundedCornerShape(
-                            bottomEnd = if (scrollState.value != 0) 0.dp else 24.dp,
-                            bottomStart = if (scrollState.value != 0) 0.dp else 24.dp
+                            bottomEnd = if (progress.isShowProgress()) 0.dp else if (scrollState.value != 0) 0.dp else 24.dp,
+                            bottomStart = if (progress.isShowProgress()) 0.dp else if (scrollState.value != 0) 0.dp else 24.dp
                         )
                     )
                     .fillMaxWidth(),
@@ -106,7 +118,7 @@ internal fun ProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = stringResource(R.string.settings),
+                            text = stringResource(R.string.profile),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -125,7 +137,6 @@ internal fun ProfileScreen(
                     Spacer(modifier = Modifier.size(40.0.dp))
                 }
             )
-
         }
     ) { paddingValues ->
         Column(
@@ -135,10 +146,29 @@ internal fun ProfileScreen(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
+            if (progress.isShowProgress()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(
+                                RoundedCornerShape(
+                                    bottomEnd = 24.dp,
+                                    bottomStart = 24.dp
+                                )
+                            )
+                            .background(color = BlackBrown)
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
+                }
+            }
 
             Column(
                 modifier = Modifier
-                    .padding(top = 16.dp)
+                    .padding(top = 16.dp, start = 4.dp, end = 4.dp)
                     .clip(
                         RoundedCornerShape(
                             topStart = 24.dp,
@@ -147,7 +177,7 @@ internal fun ProfileScreen(
                             bottomEnd = if (!isRemember) 24.dp else 0.dp
                         )
                     )
-                    .background(color = BlackBrown.copy(alpha = 0.5f))
+                    .background(color = BlackBrown.copy(alpha = 0.22f))
             ) {
 
                 Switch(
@@ -180,7 +210,11 @@ internal fun ProfileScreen(
                     }
                 )
 
-                if (isRemember) Divider(color = BlackBrown)
+                if (isRemember) Divider(
+                    modifier = Modifier.padding(bottom = 12.dp),
+                    thickness = 3.dp,
+                    color = GraphiteBlack
+                )
             }
 
             AnimatedVisibility(
@@ -188,7 +222,84 @@ internal fun ProfileScreen(
             ) {
                 Column(
                     modifier = Modifier
-                        .background(color = BlackBrown.copy(alpha = 0.5f))
+                        .padding(start = 4.dp, end = 4.dp)
+                        .fillMaxWidth()
+                        .background(color = BlackBrown.copy(alpha = 0.22f))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .weight(0.5f)
+                                .padding(16.dp),
+                            text = stringResource(id = R.string.level),
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Start,
+                            fontSize = 18.sp,
+                            lineHeight = 24.sp,
+                            color = GrayishOrange
+                        )
+
+                        CompositionLocalProvider(
+                            LocalTextInputService provides null
+                        ) {
+                            OutlineTextField(
+                                list = levels,
+                                modifier = Modifier
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = rememberRipple(color = GraphiteBlack.copy(alpha = 0.32f))
+                                    ) {
+                                        viewModel.expandLevels()
+                                    }
+                                    .padding(horizontal = 12.dp)
+                                    .weight(0.5f),
+                                onDismissDropdownMenu = {
+                                    viewModel.hideLevels()
+                                },
+                                enabled = false,
+                                expandTime = mutableStateOf(expandLevels),
+                                onClickItemMenu = { level ->
+                                    viewModel.setLevel(
+                                        level = level as? LevelModel,
+                                        currentLevel = currentLevel
+                                    )
+                                    viewModel.hideLevels()
+                                },
+                                trailingIcon = {
+                                    Icon(
+                                        painter = painterResource(
+                                            if (expandTimeFrom) R.drawable.ic_expand
+                                            else R.drawable.ic_not_expand
+                                        ),
+                                        contentDescription = "Calendar",
+                                        tint = GrayishOrange.copy(alpha = 0.32f)
+                                    )
+                                },
+                                value = currentLevel.name
+                            )
+                        }
+                    }
+
+                    Divider(
+                        modifier = Modifier.padding(top = 20.dp),
+                        thickness = 3.dp,
+                        color = GraphiteBlack
+                    )
+                }
+            }
+
+            AnimatedVisibility(
+                visible = isRemember
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(start = 4.dp, end = 4.dp)
+                        .background(color = BlackBrown.copy(alpha = 0.22f))
                 ) {
                     Text(
                         modifier = Modifier
@@ -211,9 +322,12 @@ internal fun ProfileScreen(
                             LocalTextInputService provides null
                         ) {
                             OutlineTextField(
-                                listTime = listTimeFrom,
+                                list = listTimeFrom,
                                 modifier = Modifier
-                                    .clickable {
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = rememberRipple(color = GraphiteBlack.copy(alpha = 0.32f))
+                                    ) {
                                         viewModel.expandTimeFrom()
                                     }
                                     .padding(horizontal = 12.dp)
@@ -224,7 +338,7 @@ internal fun ProfileScreen(
                                 enabled = false,
                                 expandTime = mutableStateOf(expandTimeFrom),
                                 onClickItemMenu = { time ->
-                                    viewModel.setTimeFrom(time = time)
+                                    viewModel.setTimeFrom(time = (time as? TimeModel)?.time ?: "")
                                     viewModel.hideTimeFrom()
                                 },
                                 trailingIcon = {
@@ -245,9 +359,12 @@ internal fun ProfileScreen(
                             LocalTextInputService provides null
                         ) {
                             OutlineTextField(
-                                listTime = listTimeTo,
+                                list = listTimeTo,
                                 modifier = Modifier
-                                    .clickable {
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = rememberRipple(color = GraphiteBlack.copy(alpha = 0.32f))
+                                    ) {
                                         viewModel.expandTimeTo()
                                     }
                                     .padding(horizontal = 12.dp)
@@ -258,7 +375,7 @@ internal fun ProfileScreen(
                                 enabled = false,
                                 expandTime = mutableStateOf(expandTimeTo),
                                 onClickItemMenu = { time ->
-                                    viewModel.setTimeTo(time = time)
+                                    viewModel.setTimeTo(time = (time as? TimeModel)?.time ?: "")
                                     viewModel.hideTimeTo()
                                 },
                                 trailingIcon = {
@@ -278,7 +395,8 @@ internal fun ProfileScreen(
 
                     Divider(
                         modifier = Modifier.padding(top = 24.dp),
-                        color = BlackBrown
+                        thickness = 3.dp,
+                        color = GraphiteBlack
                     )
                 }
             }
@@ -288,13 +406,14 @@ internal fun ProfileScreen(
             ) {
                 Column(
                     modifier = Modifier
+                        .padding(start = 4.dp, end = 4.dp)
                         .clip(
                             RoundedCornerShape(
                                 bottomStart = if (themes.isEmpty()) 24.dp else 0.dp,
                                 bottomEnd = if (themes.isEmpty()) 24.dp else 0.dp
                             )
                         )
-                        .background(color = BlackBrown.copy(alpha = 0.5f))
+                        .background(color = BlackBrown.copy(alpha = 0.22f))
                         .fillMaxSize()
                 ) {
                     Switch(
@@ -313,7 +432,7 @@ internal fun ProfileScreen(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .background(color = GraphiteBlack)
-                                .background(color = BlackBrown.copy(alpha = 0.5f))
+                                .background(color = BlackBrown.copy(alpha = 0.22f))
                         ) {
                             days.forEachIndexed { index, model ->
                                 CheckBox(
@@ -331,15 +450,16 @@ internal fun ProfileScreen(
 
                     if (themes.isNotEmpty()) Divider(
                         modifier = Modifier.padding(vertical = 8.dp),
-                        color = BlackBrown
+                        thickness = 3.dp,
+                        color = GraphiteBlack
                     )
 
                     if (themes.isNotEmpty()) Column(
                         modifier = Modifier
                             .background(GraphiteBlack)
                             .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
-                            .background(color = BlackBrown.copy(alpha = 0.5f))
-                            .padding(horizontal = 16.dp)
+                            .background(color = BlackBrown.copy(alpha = 0.22f))
+                            .padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
                     ) {
                         Text(
                             modifier = Modifier
@@ -352,7 +472,9 @@ internal fun ProfileScreen(
                             color = GrayishOrange
                         )
 
-                        themes.forEachIndexed { index, model ->
+                        themes.filter { model ->
+                            (model.progress).toInt() != 1
+                        }.forEachIndexed { index, model ->
                             if (index <= countThemes) RadioButton(
                                 modifier = Modifier.padding(bottom = if (themes.size in 1..2) 10.dp else 0.dp),
                                 checked = model.isChecked,

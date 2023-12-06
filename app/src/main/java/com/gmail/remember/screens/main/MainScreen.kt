@@ -165,10 +165,10 @@ internal fun MainScreen(
                 .background(color = GraphiteBlack)
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(bottom = 10.dp, top = 16.dp),
+            contentPadding = PaddingValues(bottom = 10.dp, top = 16.dp, start = 4.dp, end = 4.dp),
             columns = GridCells.Fixed(countColumn),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
             items(themes, key = { model ->
@@ -177,7 +177,7 @@ internal fun MainScreen(
                 Column(
                     modifier = Modifier
                         .clip(ShapeDefaults.Large)
-                        .background(BlackBrown.copy(0.5f)),
+                        .background(BlackBrown.copy(0.22f)),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {

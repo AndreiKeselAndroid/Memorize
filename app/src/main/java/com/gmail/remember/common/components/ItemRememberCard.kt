@@ -75,12 +75,12 @@ fun ItemRememberCard(
             }
         }
     }
-    val blackBrown: Color = BlackBrown.copy(0.5f)
+    val blackBrown: Color = BlackBrown.copy(0.22f)
 
     Box(
         modifier = Modifier
             .graphicsLayer { rotationX = angle }
-            .padding(vertical = 8.dp)
+            .padding(vertical = 4.dp)
             .clip(shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp, bottomEnd = 8.dp))
             .fillMaxWidth()
             .combinedClickable(

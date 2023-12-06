@@ -54,4 +54,12 @@ internal class ProfileUserCaseImpl @Inject constructor(
     override suspend fun setTimeTo(time: String) {
         rememberRepository.setTimeTo(time = time)
     }
+
+    override suspend fun setCount(count: String) {
+        rememberRepository.setCount(count = count)
+    }
+
+    override suspend fun changeCountInWords(count: String) {
+        rememberRepository.changeCountInWords(count = count)
+    }
 }

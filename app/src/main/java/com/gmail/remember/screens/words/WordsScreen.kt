@@ -176,7 +176,7 @@ internal fun WordsScreen(
                 .background(color = GraphiteBlack)
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(bottom = 10.dp, top = 10.dp)
+            contentPadding = PaddingValues(bottom = 10.dp, top = 10.dp, start = 4.dp, end = 4.dp)
         ) {
             items(words, key = { model -> model?.wordEng ?: "" }) { word ->
                 ItemRememberCard(
