@@ -1,7 +1,6 @@
 package com.gmail.remember.screens.profile
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.res.painterResource
@@ -61,6 +61,7 @@ import com.gmail.remember.models.isShowProgress
 import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
+import com.gmail.remember.ui.theme.Green
 import java.util.Locale
 
 const val ACTION_START_ALARM = "ACTION_START_ALARM"
@@ -91,8 +92,6 @@ internal fun ProfileScreen(
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
-    Log.e("KEK", progress.toString())
-
     Scaffold(
         modifier = Modifier
             .background(color = GraphiteBlack),
@@ -102,8 +101,10 @@ internal fun ProfileScreen(
                     .background(color = GraphiteBlack)
                     .clip(
                         RoundedCornerShape(
-                            bottomEnd = if (progress.isShowProgress()) 0.dp else if (scrollState.value != 0) 0.dp else 24.dp,
-                            bottomStart = if (progress.isShowProgress()) 0.dp else if (scrollState.value != 0) 0.dp else 24.dp
+                            bottomEnd = if (progress.isShowProgress(isRemember = isRemember)) 0.dp
+                            else if (scrollState.value != 0) 0.dp else 24.dp,
+                            bottomStart = if (progress.isShowProgress(isRemember = isRemember)) 0.dp
+                            else if (scrollState.value != 0) 0.dp else 24.dp
                         )
                     )
                     .fillMaxWidth(),
@@ -118,7 +119,13 @@ internal fun ProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = stringResource(R.string.profile),
+                            text = if (isRemember && progress != null) stringResource(
+                                R.string.active_theme,
+                                progress?.name.toString()
+                            ) else stringResource(
+                                R.string.profile
+                            ),
+                            fontWeight = FontWeight.Medium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -146,23 +153,121 @@ internal fun ProfileScreen(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
-            if (progress.isShowProgress()) {
-                Column(
+            if (progress.isShowProgress(isRemember = isRemember)) {
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .padding(top = 0.5.dp)
+                        .clip(
+                            RoundedCornerShape(
+                                bottomEnd = 24.dp,
+                                bottomStart = 24.dp
+                            )
+                        )
+                        .background(color = BlackBrown)
+                        .fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Column(
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 16.dp
+                                ),
+                            text = stringResource(R.string.all_words, progress?.size.toString()),
+                            fontWeight = FontWeight.Light,
+                            textAlign = TextAlign.Start,
+                            fontSize = 14.sp,
+                            lineHeight = 24.sp,
+                            color = GrayishOrange
+                        )
+
+                        Text(
+                            modifier = Modifier
+                                .padding(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 4.dp
+                                ),
+                            text = stringResource(
+                                R.string.learn_words,
+                                progress?.countLearnt.toString()
+                            ),
+                            fontWeight = FontWeight.Light,
+                            textAlign = TextAlign.Start,
+                            fontSize = 14.sp,
+                            lineHeight = 24.sp,
+                            color = GrayishOrange
+                        )
+
+                        Text(
+                            modifier = Modifier
+                                .padding(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 4.dp
+                                ),
+                            text = stringResource(
+                                R.string.answer_success,
+                                progress?.countSuccess.toString()
+                            ),
+                            fontWeight = FontWeight.Light,
+                            textAlign = TextAlign.Start,
+                            fontSize = 14.sp,
+                            lineHeight = 24.sp,
+                            color = GrayishOrange
+                        )
+
+                        Text(
+                            modifier = Modifier
+                                .padding(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 4.dp,
+                                    bottom = 16.dp
+                                ),
+                            text = stringResource(
+                                R.string.answer_error,
+                                progress?.countError.toString()
+                            ),
+                            fontWeight = FontWeight.Light,
+                            textAlign = TextAlign.Start,
+                            fontSize = 14.sp,
+                            lineHeight = 24.sp,
+                            color = GrayishOrange
+                        )
+                    }
+
                     Box(
                         modifier = Modifier
-                            .clip(
-                                RoundedCornerShape(
-                                    bottomEnd = 24.dp,
-                                    bottomStart = 24.dp
-                                )
-                            )
-                            .background(color = BlackBrown)
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    )
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                            .size(70.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "${((progress?.progress ?: 0f) * 100).toInt()}%",
+                            fontWeight = FontWeight.ExtraBold,
+                            textAlign = TextAlign.Start,
+                            maxLines = 1,
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+                            color = GrayishOrange
+                        )
+                        CircularProgressIndicator(
+                            modifier = Modifier.fillMaxSize(),
+                            color = Color.Red.copy(alpha = 0.32f),
+                            progress = 1f
+                        )
+                        CircularProgressIndicator(
+                            modifier = Modifier.fillMaxSize(),
+                            color = Green,
+                            progress = progress?.progress ?: 0f
+                        )
+                    }
                 }
             }
 
@@ -472,9 +577,7 @@ internal fun ProfileScreen(
                             color = GrayishOrange
                         )
 
-                        themes.filter { model ->
-                            (model.progress).toInt() != 1
-                        }.forEachIndexed { index, model ->
+                        themes.forEachIndexed { index, model ->
                             if (index <= countThemes) RadioButton(
                                 modifier = Modifier.padding(bottom = if (themes.size in 1..2) 10.dp else 0.dp),
                                 checked = model.isChecked,

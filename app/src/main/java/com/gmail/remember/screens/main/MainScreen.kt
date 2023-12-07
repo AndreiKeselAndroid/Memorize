@@ -117,6 +117,7 @@ internal fun MainScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
+                            fontWeight = FontWeight.Medium,
                             text = stringResource(
                                 id = R.string.themes
                             )
@@ -191,7 +192,8 @@ internal fun MainScreen(
                             )
                         },
                         onLongClick = {
-                            viewModel.deleteSection(name = theme.name)
+                            if (!theme.isChecked)
+                                viewModel.deleteSection(name = theme.name)
                         }
                     )
                     Text(

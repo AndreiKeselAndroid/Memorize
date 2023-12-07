@@ -13,11 +13,12 @@ internal val Braun = Color(0xFFEA8068)
 internal val Yellow = Color(0xFFFCC934)
 internal val GraphiteBlack
     @Composable get() = if (isSystemInDarkTheme()) Color(0xFF1A1208)
-    else Color(0xFFFEF9F3)
+    else Color(0xFFFDFDFD)
 
 internal val BlackBrown
-    @Composable get() = if (isSystemInDarkTheme()) Color(0xFF2C1F0F)
-    else Color(0xFFF2E8DE)
+    @Composable get() = if (isSystemInDarkTheme()) Color(0xFF47351F)
+    else Color(0xFFD5CEC8)
+
 
 internal val GrayishOrange
     @Composable get() = if (isSystemInDarkTheme()) Color(0xFFFFDCBE)

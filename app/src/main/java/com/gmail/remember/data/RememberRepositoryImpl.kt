@@ -310,7 +310,7 @@ internal class RememberRepositoryImpl @Inject constructor(
             .collectLatest { result ->
                 result.forEach { map ->
                     map.forEach { entry ->
-                        if (entry.key != null && entry.value != null && entry.value!!.countSuccess > 0 && entry.value!!.countSuccess != count.toInt()) {
+                        if (entry.key != null && entry.value != null && entry.value!!.countSuccess > count.toInt()) {
                             dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
                                 .child(THEMES)
                                 .child(entry.key!!)

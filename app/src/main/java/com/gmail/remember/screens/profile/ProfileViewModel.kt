@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 const val DEFAULT_COUNT_THEMES = 1
@@ -96,12 +97,16 @@ internal class ProfileViewModel @Inject constructor(
                                 countLearnt += 1
                         }
                         ProgressModel(
-                            name = theme.name,
-                            progress = (theme.progress * 100).toInt(),
+                            name = theme.name.replaceFirstChar { char ->
+                                if (char.isLowerCase()) char.titlecase(
+                                    Locale.ROOT
+                                ) else char.toString()
+                            }.trim(),
+                            progress = theme.progress,
                             countSuccess = countSuccess,
                             countError = countError,
                             countLearnt = countLearnt,
-                            size =  snapshots.children.map { snapshot ->
+                            size = snapshots.children.map { snapshot ->
                                 snapshot.getValue(WordModel::class.java)
                             }.size
                         )
