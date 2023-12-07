@@ -1,17 +1,15 @@
 package com.gmail.remember.data.api.models.dictionary
 
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class Meaning(
-    @SerialName("antonyms")
+    @SerializedName("antonyms")
     val antonyms: List<String>,
-    @SerialName("definitions")
+    @SerializedName("definitions")
     val definitions: List<Definition>,
-    @SerialName("partOfSpeech")
+    @SerializedName("partOfSpeech")
     val partOfSpeech: String,
-    @SerialName("synonyms")
+    @SerializedName("synonyms")
     val synonyms: List<String>
 )

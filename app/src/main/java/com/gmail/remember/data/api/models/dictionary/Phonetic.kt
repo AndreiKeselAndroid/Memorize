@@ -1,17 +1,15 @@
 package com.gmail.remember.data.api.models.dictionary
 
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class Phonetic(
-    @SerialName("audio")
+    @SerializedName("audio")
     val audio: String,
-    @SerialName("license")
+    @SerializedName("license")
     val license: License,
-    @SerialName("sourceUrl")
+    @SerializedName("sourceUrl")
     val sourceUrl: String,
-    @SerialName("text")
+    @SerializedName("text")
     val text: String
 )

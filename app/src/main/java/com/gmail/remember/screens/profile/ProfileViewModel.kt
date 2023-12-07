@@ -14,6 +14,7 @@ import com.gmail.remember.models.WordModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -96,6 +97,7 @@ internal class ProfileViewModel @Inject constructor(
                             if (model?.countSuccess == level.countSuccess)
                                 countLearnt += 1
                         }
+                        delay(1500)
                         ProgressModel(
                             name = theme.name.replaceFirstChar { char ->
                                 if (char.isLowerCase()) char.titlecase(
@@ -112,6 +114,7 @@ internal class ProfileViewModel @Inject constructor(
                         )
                     }
                 } catch (e: Exception) {
+                    delay(1000)
                     emptyFlow()
                 }
             }

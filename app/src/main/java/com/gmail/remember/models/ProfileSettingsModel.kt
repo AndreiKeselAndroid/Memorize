@@ -2,9 +2,7 @@ package com.gmail.remember.models
 
 import com.gmail.remember.utils.decrypt
 import com.gmail.remember.utils.encrypt
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class ProfileSettingsModel(
     val idToken: String? = "",
     val familyName: String? = "",

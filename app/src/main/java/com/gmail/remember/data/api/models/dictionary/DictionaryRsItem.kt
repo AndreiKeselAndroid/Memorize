@@ -1,19 +1,17 @@
 package com.gmail.remember.data.api.models.dictionary
 
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class DictionaryRsItem(
-    @SerialName("license")
+    @SerializedName("license")
     val license: License?,
-    @SerialName("meanings")
+    @SerializedName("meanings")
     val meanings: List<Meaning>,
-    @SerialName("phonetics")
+    @SerializedName("phonetics")
     val phonetics: List<Phonetic?>,
-    @SerialName("sourceUrls")
+    @SerializedName("sourceUrls")
     val sourceUrls: List<String>,
-    @SerialName("word")
+    @SerializedName("word")
     val word: String
 )

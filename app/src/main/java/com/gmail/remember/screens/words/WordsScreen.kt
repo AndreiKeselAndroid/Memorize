@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +40,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.gmail.remember.R
 import com.gmail.remember.common.components.ItemRememberCard
 import com.gmail.remember.models.WordModel
@@ -60,6 +66,17 @@ internal fun WordsScreen(
     val childName by viewModel.childName.collectAsState()
     val countSuccess by viewModel.countSuccess.collectAsState()
     val state = rememberLazyListState()
+
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(if (words == null) R.raw.loading_lottie else R.raw.empty_lottie)
+    )
+    val progress by animateLottieCompositionAsState(
+        composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true,
+        speed = 1f,
+        restartOnPlay = true
+    )
 
 
     Scaffold(
@@ -135,7 +152,7 @@ internal fun WordsScreen(
                 actions = {
                     if (selectedWords.isNotEmpty()) IconButton(onClick = {
                         viewModel.selectedAllHandler(
-                            allWords = words,
+                            allWords = words ?: emptyList(),
                             selectedWords = selectedWords,
                         )
                     }) {
@@ -172,7 +189,7 @@ internal fun WordsScreen(
             }
         }
     ) { paddingValues ->
-        LazyColumn(
+        if (words != null && words?.isNotEmpty() == true) LazyColumn(
             state = state,
             modifier = Modifier
                 .background(color = GraphiteBlack)
@@ -180,7 +197,7 @@ internal fun WordsScreen(
                 .padding(paddingValues),
             contentPadding = PaddingValues(bottom = 10.dp, top = 10.dp, start = 4.dp, end = 4.dp)
         ) {
-            items(words, key = { model -> model?.wordEng ?: "" }) { word ->
+            items(words!!, key = { model -> model?.wordEng ?: "" }) { word ->
                 ItemRememberCard(
                     model = word ?: WordModel(),
                     countSuccess = countSuccess,
@@ -189,7 +206,7 @@ internal fun WordsScreen(
                     onLongClick = { model ->
                         viewModel.enableMultiSelect(
                             word = model,
-                            words = words,
+                            words = words!!,
                             childName = childName
                         )
                     },
@@ -198,6 +215,32 @@ internal fun WordsScreen(
                     }
                 )
             }
+        }
+        else if (words != null) Box(
+            modifier = Modifier
+                .background(color = GraphiteBlack)
+                .padding(20.dp)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LottieAnimation(
+                composition,
+                progress,
+                modifier = Modifier.padding(20.dp)
+            )
+        }
+        else Box(
+            modifier = Modifier
+                .background(color = GraphiteBlack)
+                .padding(20.dp)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LottieAnimation(
+                composition,
+                progress,
+                modifier = Modifier.padding(20.dp)
+            )
         }
     }
 }

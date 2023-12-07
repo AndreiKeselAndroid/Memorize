@@ -6,6 +6,7 @@ import com.gmail.remember.domain.usercases.MainUserCase
 import com.gmail.remember.models.ThemeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,15 +29,16 @@ class MainViewModel @Inject constructor(
     private val _name: MutableStateFlow<String> = MutableStateFlow("")
     val name: StateFlow<String> = _name.asStateFlow()
 
-    val themes: StateFlow<List<ThemeModel>> by lazy {
+    val themes: StateFlow<List<ThemeModel>?> by lazy {
         mainUserCase.themes.combine(mainUserCase.settingsProfile) { themes, profile ->
+            delay(1000)
             themes.map { model ->
                 model.copy(
                     isChecked = model.name == profile.theme
                 )
             }
         }
-            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+            .stateIn(viewModelScope, SharingStarted.Lazily, null)
     }
 
     val photoUrl: StateFlow<String> by lazy {

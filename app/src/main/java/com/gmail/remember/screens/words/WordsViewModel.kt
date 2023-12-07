@@ -10,6 +10,7 @@ import com.gmail.remember.navigation.CHILD_NAME
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -47,8 +48,9 @@ internal class WordsViewModel @Inject constructor(
     val selectedWords: StateFlow<List<WordModel?>> = _selectedWords.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val words: StateFlow<List<WordModel?>> by lazy {
+    val words: StateFlow<List<WordModel?>?> by lazy {
         childName.flatMapLatest { name ->
+            delay(1000)
             rememberUserCase.words(name).combine(_selectedWords.asStateFlow()) { snapshots, words ->
                 snapshots.children.map { snapshot ->
                     if (words.contains(snapshot.getValue(WordModel::class.java)))
@@ -58,7 +60,7 @@ internal class WordsViewModel @Inject constructor(
             }
         }
             .flowOn(Dispatchers.IO)
-            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+            .stateIn(viewModelScope, SharingStarted.Lazily, null)
     }
 
     fun enableMultiSelect(word: WordModel, words: List<WordModel?>, childName: String) {

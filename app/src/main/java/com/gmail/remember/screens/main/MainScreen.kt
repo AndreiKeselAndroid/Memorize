@@ -43,6 +43,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -51,6 +52,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.gmail.remember.R
 import com.gmail.remember.common.components.Button
 import com.gmail.remember.common.components.ItemBrainCard
@@ -60,6 +66,7 @@ import com.gmail.remember.navigation.navigateSafeArgs
 import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
+import com.gmail.remember.ui.theme.Green
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,6 +85,16 @@ internal fun MainScreen(
     val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
     val countColumn by remember { mutableStateOf((screenWidthDp / 200f + 0.5).toInt()) }
     val state = rememberLazyGridState()
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(if (themes == null) R.raw.loading_lottie else R.raw.empty_lottie)
+    )
+    val progress by animateLottieCompositionAsState(
+        composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true,
+        speed = 1f,
+        restartOnPlay = true
+    )
 
     Scaffold(
         modifier = Modifier
@@ -146,21 +163,41 @@ internal fun MainScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                containerColor = GrayishOrange,
-                onClick = {
-                    viewModel.showDialog()
-                }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    tint = BlackBrown,
-                    contentDescription = "Add"
-                )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                FloatingActionButton(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .padding(8.dp),
+                    containerColor = Green,
+                    onClick = {
+
+                    }) {
+                    Icon(
+                        painter = painterResource(
+                            id = R.drawable.ic_check
+                        ),
+                        tint = BlackBrown,
+                        contentDescription = "Test"
+                    )
+                }
+
+                FloatingActionButton(
+                    containerColor = GrayishOrange,
+                    onClick = {
+                        viewModel.showDialog()
+                    }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        tint = BlackBrown,
+                        contentDescription = "Add"
+                    )
+                }
             }
         }
     ) { paddingValues ->
-
-        LazyVerticalGrid(
+        if (themes != null && themes?.isNotEmpty() == true) LazyVerticalGrid(
             state = state,
             modifier = Modifier
                 .background(color = GraphiteBlack)
@@ -172,7 +209,7 @@ internal fun MainScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
-            items(themes, key = { model ->
+            items(themes!!, key = { model ->
                 model.name
             }) { theme ->
                 Column(
@@ -209,6 +246,32 @@ internal fun MainScreen(
                     )
                 }
             }
+        }
+        else if (themes != null) Box(
+            modifier = Modifier
+                .background(color = GraphiteBlack)
+                .padding(20.dp)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LottieAnimation(
+                composition,
+                progress,
+                modifier = Modifier.padding(20.dp)
+            )
+        }
+        else Box(
+            modifier = Modifier
+                .background(color = GraphiteBlack)
+                .padding(20.dp)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LottieAnimation(
+                composition,
+                progress,
+                modifier = Modifier.padding(20.dp)
+            )
         }
 
         if (showDialog) AlertDialog(
@@ -248,7 +311,7 @@ internal fun MainScreen(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = name.isNotEmpty(),
                     onClick = {
-                        viewModel.addSection(name, themes)
+                        viewModel.addSection(name, themes ?: emptyList())
                         viewModel.dismissDialog()
                         focusManager.clearFocus()
                     }

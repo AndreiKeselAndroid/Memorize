@@ -50,6 +50,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.gmail.remember.R
 import com.gmail.remember.common.components.CheckBox
 import com.gmail.remember.common.components.OutlineTextField
@@ -91,8 +96,18 @@ internal fun ProfileScreen(
     val progress by viewModel.progress.collectAsState()
     val scrollState = rememberScrollState()
     val context = LocalContext.current
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.loading_lottie)
+    )
+    val progressLottie by animateLottieCompositionAsState(
+        composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true,
+        speed = 1f,
+        restartOnPlay = true
+    )
 
-    Scaffold(
+    if (progress != null) Scaffold(
         modifier = Modifier
             .background(color = GraphiteBlack),
         topBar = {
@@ -119,7 +134,7 @@ internal fun ProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = if (isRemember && progress != null) stringResource(
+                            text = if (isRemember) stringResource(
                                 R.string.active_theme,
                                 progress?.name.toString()
                             ) else stringResource(
@@ -621,5 +636,18 @@ internal fun ProfileScreen(
                 }
             }
         }
+    }
+    else Box(
+        modifier = Modifier
+            .background(color = GraphiteBlack)
+            .padding(20.dp)
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        LottieAnimation(
+            composition,
+            progressLottie,
+            modifier = Modifier.padding(20.dp)
+        )
     }
 }
