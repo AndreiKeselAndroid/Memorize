@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.gmail.remember.screens.words
 
 import androidx.compose.foundation.background
@@ -30,7 +32,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +48,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.gmail.remember.R
 import com.gmail.remember.common.components.ItemRememberCard
+import com.gmail.remember.data.api.models.Result
 import com.gmail.remember.models.WordModel
 import com.gmail.remember.navigation.Screens
 import com.gmail.remember.navigation.navigateSafeArgs
@@ -66,18 +68,28 @@ internal fun WordsScreen(
     val childName by viewModel.childName.collectAsState()
     val countSuccess by viewModel.countSuccess.collectAsState()
     val state = rememberLazyListState()
-
-    val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(if (words == null) R.raw.loading_lottie else R.raw.empty_lottie)
+    val stateUi by viewModel.stateUi.collectAsState()
+    val emptyComposition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.empty_lottie)
     )
-    val progress by animateLottieCompositionAsState(
-        composition,
+    val emptyProgress by animateLottieCompositionAsState(
+        emptyComposition,
         iterations = LottieConstants.IterateForever,
         isPlaying = true,
         speed = 1f,
         restartOnPlay = true
     )
 
+    val errorComposition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.error_lottie)
+    )
+    val errorProgress by animateLottieCompositionAsState(
+        errorComposition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true,
+        speed = 1f,
+        restartOnPlay = true
+    )
 
     Scaffold(
         modifier = Modifier
@@ -216,7 +228,7 @@ internal fun WordsScreen(
                 )
             }
         }
-        else if (words != null) Box(
+        else if (words?.isEmpty() == true) Box(
             modifier = Modifier
                 .background(color = GraphiteBlack)
                 .padding(20.dp)
@@ -224,23 +236,36 @@ internal fun WordsScreen(
             contentAlignment = Alignment.Center
         ) {
             LottieAnimation(
-                composition,
-                progress,
+                emptyComposition,
+                emptyProgress,
                 modifier = Modifier.padding(20.dp)
             )
         }
-        else Box(
-            modifier = Modifier
-                .background(color = GraphiteBlack)
-                .padding(20.dp)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            LottieAnimation(
-                composition,
-                progress,
-                modifier = Modifier.padding(20.dp)
+    }
+
+    when(stateUi){
+        is Result.Success -> {
+            viewModel.setWords(
+                words = ((stateUi as? Result.Success<*>)?.data as? List<WordModel?>) ?: emptyList()
             )
         }
+
+        is Result.Error -> {
+            Box(
+                modifier = Modifier
+                    .background(color = GraphiteBlack)
+                    .padding(20.dp)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LottieAnimation(
+                    errorComposition,
+                    errorProgress,
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
+        }
+
+        else -> {}
     }
 }

@@ -27,5 +27,5 @@
     <string name="learn_words">Изучено слов: %1$s</string>
     <string name="answer_success">Правильных ответов: %1$s</string>
     <string name="answer_error">Неправильных ответов: %1$s</string>
-    <string name="active_theme">Активная тема: \"%1$s\"</string>
+    <string name="active_theme">Изучается тема: \"%1$s\"</string>
 </resources>

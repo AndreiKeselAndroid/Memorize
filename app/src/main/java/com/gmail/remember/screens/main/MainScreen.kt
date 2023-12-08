@@ -61,6 +61,8 @@ import com.gmail.remember.R
 import com.gmail.remember.common.components.Button
 import com.gmail.remember.common.components.ItemBrainCard
 import com.gmail.remember.common.components.OutlineTextField
+import com.gmail.remember.data.api.models.Result
+import com.gmail.remember.models.ThemeModel
 import com.gmail.remember.navigation.Screens
 import com.gmail.remember.navigation.navigateSafeArgs
 import com.gmail.remember.ui.theme.BlackBrown
@@ -79,17 +81,29 @@ internal fun MainScreen(
     val showDialog by viewModel.showDialog.collectAsState()
     val name by viewModel.name.collectAsState()
     val themes by viewModel.themes.collectAsState()
+    val stateUi by viewModel.stateUi.collectAsState()
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     val displayMetrics = LocalContext.current.resources.displayMetrics
     val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
     val countColumn by remember { mutableStateOf((screenWidthDp / 200f + 0.5).toInt()) }
     val state = rememberLazyGridState()
-    val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(if (themes == null) R.raw.loading_lottie else R.raw.empty_lottie)
+
+    val emptyComposition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.empty_lottie)
     )
-    val progress by animateLottieCompositionAsState(
-        composition,
+    val emptyProgress by animateLottieCompositionAsState(
+        emptyComposition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true,
+        speed = 1f,
+        restartOnPlay = true
+    )
+    val errorComposition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.error_lottie)
+    )
+    val errorProgress by animateLottieCompositionAsState(
+        errorComposition,
         iterations = LottieConstants.IterateForever,
         isPlaying = true,
         speed = 1f,
@@ -247,7 +261,7 @@ internal fun MainScreen(
                 }
             }
         }
-        else if (themes != null) Box(
+        else if (themes?.isEmpty() == true) Box(
             modifier = Modifier
                 .background(color = GraphiteBlack)
                 .padding(20.dp)
@@ -255,21 +269,8 @@ internal fun MainScreen(
             contentAlignment = Alignment.Center
         ) {
             LottieAnimation(
-                composition,
-                progress,
-                modifier = Modifier.padding(20.dp)
-            )
-        }
-        else Box(
-            modifier = Modifier
-                .background(color = GraphiteBlack)
-                .padding(20.dp)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            LottieAnimation(
-                composition,
-                progress,
+                emptyComposition,
+                emptyProgress,
                 modifier = Modifier.padding(20.dp)
             )
         }
@@ -326,5 +327,30 @@ internal fun MainScreen(
             textContentColor = GrayishOrange,
             shape = ShapeDefaults.Medium,
         )
+    }
+    when (stateUi) {
+        is Result.Success -> {
+            viewModel.setThemes(
+                themes = (stateUi as? Result.Success<List<ThemeModel>>)?.data ?: emptyList()
+            )
+        }
+
+        is Result.Error -> {
+            Box(
+                modifier = Modifier
+                    .background(color = GraphiteBlack)
+                    .padding(20.dp)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LottieAnimation(
+                    errorComposition,
+                    errorProgress,
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
+        }
+
+        else -> {}
     }
 }

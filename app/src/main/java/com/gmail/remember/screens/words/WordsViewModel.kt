@@ -10,7 +10,8 @@ import com.gmail.remember.navigation.CHILD_NAME
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
+import com.gmail.remember.data.api.models.Result
+import com.gmail.remember.data.api.models.asResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -47,10 +48,12 @@ internal class WordsViewModel @Inject constructor(
         MutableStateFlow(emptyList())
     val selectedWords: StateFlow<List<WordModel?>> = _selectedWords.asStateFlow()
 
+    private val _words: MutableStateFlow<List<WordModel?>?> = MutableStateFlow(null)
+    val words: StateFlow<List<WordModel?>?> = _words
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    val words: StateFlow<List<WordModel?>?> by lazy {
+    val stateUi: StateFlow<Result<List<WordModel?>?>> by lazy {
         childName.flatMapLatest { name ->
-            delay(1000)
             rememberUserCase.words(name).combine(_selectedWords.asStateFlow()) { snapshots, words ->
                 snapshots.children.map { snapshot ->
                     if (words.contains(snapshot.getValue(WordModel::class.java)))
@@ -58,9 +61,15 @@ internal class WordsViewModel @Inject constructor(
                     else snapshot.getValue(WordModel::class.java)
                 }
             }
+        }.asResult().map { result ->
+            when (result) {
+                is Result.Loading -> Result.Loading
+                is Result.Success -> Result.Success(result.data)
+                is Result.Error -> Result.Error(result.throwable)
+            }
         }
             .flowOn(Dispatchers.IO)
-            .stateIn(viewModelScope, SharingStarted.Lazily, null)
+            .stateIn(viewModelScope, SharingStarted.Lazily, Result.Loading)
     }
 
     fun enableMultiSelect(word: WordModel, words: List<WordModel?>, childName: String) {
@@ -124,6 +133,12 @@ internal class WordsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             rememberUserCase.deleteWords(models = models, childName = childName)
             unSelectAllWords()
+        }
+    }
+
+    fun setWords(words: List<WordModel?>) {
+        viewModelScope.launch {
+            _words.emit(words)
         }
     }
 }

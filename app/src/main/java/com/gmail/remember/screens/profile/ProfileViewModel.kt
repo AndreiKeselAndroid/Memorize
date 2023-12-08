@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gmail.remember.data.RememberData.listLevels
 import com.gmail.remember.data.RememberData.listTime
+import com.gmail.remember.data.api.models.Result
+import com.gmail.remember.data.api.models.asResult
 import com.gmail.remember.domain.usercases.ProfileUserCase
 import com.gmail.remember.models.DayModel
 import com.gmail.remember.models.LevelModel
@@ -14,14 +16,13 @@ import com.gmail.remember.models.WordModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -75,8 +76,11 @@ internal class ProfileViewModel @Inject constructor(
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     }
 
+    private val _progress: MutableStateFlow<ProgressModel?> = MutableStateFlow(null)
+    val progress: StateFlow<ProgressModel?> = _progress.asStateFlow()
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    val progress: StateFlow<ProgressModel?> by lazy {
+    val stateUi: StateFlow<Result<ProgressModel?>> by lazy {
         level.flatMapLatest { level ->
             themes.flatMapLatest { themes ->
                 var countSuccess = 0
@@ -97,7 +101,6 @@ internal class ProfileViewModel @Inject constructor(
                             if (model?.countSuccess == level.countSuccess)
                                 countLearnt += 1
                         }
-                        delay(1500)
                         ProgressModel(
                             name = theme.name.replaceFirstChar { char ->
                                 if (char.isLowerCase()) char.titlecase(
@@ -114,13 +117,18 @@ internal class ProfileViewModel @Inject constructor(
                         )
                     }
                 } catch (e: Exception) {
-                    delay(1000)
-                    emptyFlow()
+                   flow {emit(ProgressModel()) }
                 }
+            }
+        }.asResult().map { result ->
+            when (result) {
+                is Result.Loading -> Result.Loading
+                is Result.Success -> Result.Success(result.data)
+                is Result.Error -> Result.Error(result.throwable)
             }
         }
             .flowOn(Dispatchers.IO)
-            .stateIn(viewModelScope, SharingStarted.Lazily, null)
+            .stateIn(viewModelScope, SharingStarted.Lazily, Result.Loading)
     }
 
 
@@ -336,6 +344,12 @@ internal class ProfileViewModel @Inject constructor(
                     else -> {}
                 }
             }
+        }
+    }
+
+    fun setProgress(progress: ProgressModel) {
+        viewModelScope.launch {
+            _progress.emit(progress)
         }
     }
 }

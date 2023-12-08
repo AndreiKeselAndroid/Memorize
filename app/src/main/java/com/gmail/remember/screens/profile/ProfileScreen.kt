@@ -60,7 +60,9 @@ import com.gmail.remember.common.components.CheckBox
 import com.gmail.remember.common.components.OutlineTextField
 import com.gmail.remember.common.components.RadioButton
 import com.gmail.remember.common.components.Switch
+import com.gmail.remember.data.api.models.Result
 import com.gmail.remember.models.LevelModel
+import com.gmail.remember.models.ProgressModel
 import com.gmail.remember.models.TimeModel
 import com.gmail.remember.models.isShowProgress
 import com.gmail.remember.ui.theme.BlackBrown
@@ -94,6 +96,7 @@ internal fun ProfileScreen(
     val currentLevel by viewModel.level.collectAsState()
     val expandLevels by viewModel.expandLevels.collectAsState()
     val progress by viewModel.progress.collectAsState()
+    val stateUi by viewModel.stateUi.collectAsState()
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val composition by rememberLottieComposition(
@@ -107,7 +110,7 @@ internal fun ProfileScreen(
         restartOnPlay = true
     )
 
-    if (progress != null) Scaffold(
+    Scaffold(
         modifier = Modifier
             .background(color = GraphiteBlack),
         topBar = {
@@ -133,17 +136,39 @@ internal fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = if (isRemember) stringResource(
-                                R.string.active_theme,
-                                progress?.name.toString()
-                            ) else stringResource(
-                                R.string.profile
-                            ),
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Column {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                text = stringResource(
+                                    R.string.profile
+                                ),
+                                fontWeight = FontWeight.Medium,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            if (progress?.name?.isNotEmpty() == true &&
+                                progress.isShowProgress(isRemember = isRemember)
+                            ) Text(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(
+                                        start = 16.dp,
+                                        end = 16.dp,
+                                        top = 4.dp
+                                    ),
+                                text = stringResource(
+                                    R.string.active_theme,
+                                    progress?.name ?: ""
+                                ),
+                                fontWeight = FontWeight.Normal,
+                                textAlign = TextAlign.Center,
+                                fontSize = 14.sp,
+                                lineHeight = 24.sp,
+                                color = GrayishOrange
+                            )
+                        }
                     }
                 },
                 navigationIcon = {
@@ -193,7 +218,10 @@ internal fun ProfileScreen(
                                     end = 16.dp,
                                     top = 16.dp
                                 ),
-                            text = stringResource(R.string.all_words, progress?.size.toString()),
+                            text = stringResource(
+                                R.string.all_words,
+                                progress?.size.toString()
+                            ),
                             fontWeight = FontWeight.Light,
                             textAlign = TextAlign.Start,
                             fontSize = 14.sp,
@@ -637,17 +665,31 @@ internal fun ProfileScreen(
             }
         }
     }
-    else Box(
-        modifier = Modifier
-            .background(color = GraphiteBlack)
-            .padding(20.dp)
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        LottieAnimation(
-            composition,
-            progressLottie,
-            modifier = Modifier.padding(20.dp)
-        )
+
+    when (stateUi) {
+        is Result.Success -> {
+            viewModel.setProgress(
+                progress = ((stateUi as? Result.Success<*>)?.data as? ProgressModel)
+                    ?: ProgressModel()
+            )
+        }
+
+        is Result.Loading -> {
+            if (isRemember) Box(
+                modifier = Modifier
+                    .background(color = GraphiteBlack)
+                    .padding(20.dp)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LottieAnimation(
+                    composition,
+                    progressLottie,
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
+        }
+
+        else -> {}
     }
 }
