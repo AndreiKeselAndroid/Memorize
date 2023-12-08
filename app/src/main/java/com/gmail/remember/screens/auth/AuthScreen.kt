@@ -1,5 +1,6 @@
 package com.gmail.remember.screens.auth
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -35,6 +36,7 @@ import com.gmail.remember.ui.theme.GrayishOrange
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun AuthScreen(
     navController: NavHostController,
