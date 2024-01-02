@@ -129,7 +129,7 @@ fun ItemRememberCard(
                 overflow = TextOverflow.Ellipsis,
             )
 
-            if (model.isCheck) Image(
+            if (model.check) Image(
                 modifier = Modifier
                     .graphicsLayer { rotationX = angle }
                     .padding(end = 16.dp),

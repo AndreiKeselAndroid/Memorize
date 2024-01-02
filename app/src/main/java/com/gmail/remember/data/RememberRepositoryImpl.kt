@@ -44,7 +44,8 @@ import javax.inject.Inject
 
 private const val THEMES = "themes"
 private const val PROFILE = "profile"
-private const val COUNT = "countSuccess"
+private const val COUNT_SUCCESS = "countSuccess"
+private const val COUNT_ERROR = "countError"
 private const val ALL_DAYS = "allDays"
 private const val IS_REMEMBER = "remember"
 private const val DAYS = "days"
@@ -75,7 +76,7 @@ internal class RememberRepositoryImpl @Inject constructor(
             .snapshots.combine(
                 dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
                     .child(PROFILE)
-                    .child(COUNT)
+                    .child(COUNT_SUCCESS)
                     .snapshots
             ) { themes, count ->
                 themes.children.map { children ->
@@ -291,7 +292,7 @@ internal class RememberRepositoryImpl @Inject constructor(
     override suspend fun setCount(count: String) {
         dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
-            .child(COUNT)
+            .child(COUNT_SUCCESS)
             .setValue(count.encrypt())
     }
 
@@ -315,11 +316,29 @@ internal class RememberRepositoryImpl @Inject constructor(
                                 .child(THEMES)
                                 .child(entry.key!!)
                                 .child(entry.value!!.wordEng)
-                                .child(COUNT)
+                                .child(COUNT_SUCCESS)
                                 .setValue(count.toInt())
                         }
                     }
                 }
             }
+    }
+
+    override suspend fun changeCountSuccessInWord(wordModel: WordModel) {
+        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+            .child(THEMES)
+            .child(wordModel.theme)
+            .child(wordModel.wordEng)
+            .child(COUNT_SUCCESS)
+            .setValue(wordModel.countSuccess.plus(1))
+    }
+
+    override suspend fun changeCountErrorInWord(wordModel: WordModel) {
+        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+            .child(THEMES)
+            .child(wordModel.theme)
+            .child(wordModel.wordEng)
+            .child(COUNT_ERROR)
+            .setValue(wordModel.countError.plus(1))
     }
 }

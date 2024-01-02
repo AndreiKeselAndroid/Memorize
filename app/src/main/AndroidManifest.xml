@@ -16,7 +16,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-
+        android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/Theme.Remember"
         tools:ignore="DataExtractionRules"
@@ -24,19 +24,31 @@
         <activity
             android:name=".main.RememberActivity"
             android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Remember"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="remember.com"
+                    android:scheme="https" />
+            </intent-filter>
         </activity>
 
         <receiver
             android:name=".receiver.RememberBroadcastReceiver"
-            android:exported="false">
-        </receiver>
+            android:exported="false" />
 
     </application>
 

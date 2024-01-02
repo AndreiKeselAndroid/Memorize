@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Запоминалка</string>
     <string name="words">Слова</string>
+    <string name="title_ok">Понятно</string>
     <string name="themes">Темы</string>
     <string name="time">Время</string>
     <string name="level">Уровень сложности</string>
@@ -17,15 +18,19 @@
     <string name="all_days">Все дни недели</string>
     <string name="answer">Ответить</string>
     <string name="more">Ещё</string>
-    <string name="correct_answer">%1$s! Правильный ответ %2$s</string>
+    <string name="correct_answer">Правильный ответ %1$s</string>
     <string name="enter_answer">Введите ответ</string>
-    <string name="right">Верно</string>
-    <string name="wrong">Неверно</string>
+    <string name="right">🤗🤗🤗🤗 Верно!!! 👍👍👍🙋‍</string>
+    <string name="wrong">☹️☹️☹️☹️ Неверно!!! 👎👎👎🤦‍</string>
     <string name="hide">Скрыть</string>
     <string name="profile">Профиль</string>
     <string name="all_words">Всего слов: %1$s</string>
     <string name="learn_words">Изучено слов: %1$s</string>
+    <string name="chose_theme">⚠️ Выберите тему для изучения️!</string>
     <string name="answer_success">Правильных ответов: %1$s</string>
     <string name="answer_error">Неправильных ответов: %1$s</string>
     <string name="active_theme">Прогресс по теме: \"%1$s\"</string>
+    <string name="title_training">Тренировка</string>
+    <string name="error_message">Неверно!!! Правильный ответ: %1$s</string>
+    <string name="chose_new_theme">Выберите другую тему или добавте слова!</string>
 </resources>

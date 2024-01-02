@@ -1,6 +1,11 @@
 package com.gmail.remember.screens.auth
 
 import android.annotation.SuppressLint
+import android.app.Activity.RESULT_OK
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -42,9 +47,17 @@ fun AuthScreen(
     navController: NavHostController,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
         onResult = { result ->
+            if (result.resultCode == RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val intent = Intent(
+                    Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
+                    Uri.parse("package:${context.packageName}")
+                )
+                context.startActivity(intent)
+            }
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             runCatching {
                 val account = task.getResult(ApiException::class.java)

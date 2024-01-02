@@ -241,9 +241,15 @@ internal fun WordsScreen(
                 modifier = Modifier.padding(20.dp)
             )
         }
+        else Box(
+            modifier = Modifier
+                .background(color = GraphiteBlack)
+                .padding(20.dp)
+                .fillMaxSize()
+        )
     }
 
-    when(stateUi){
+    when (stateUi) {
         is Result.Success -> {
             viewModel.setWords(
                 words = ((stateUi as? Result.Success<*>)?.data as? List<WordModel?>) ?: emptyList()

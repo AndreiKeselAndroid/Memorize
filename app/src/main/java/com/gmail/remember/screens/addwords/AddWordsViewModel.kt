@@ -65,6 +65,7 @@ internal class AddWordsViewModel @Inject constructor(
             addWordsUserCase.addWord(
                 model = WordModel(
                     wordEng = enWord,
+                    theme = childName,
                     wordRu = ruWord,
                     url = try {
                         var url = ""

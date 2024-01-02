@@ -7,13 +7,17 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.gmail.remember.screens.addwords.AddWordsScreen
 import com.gmail.remember.screens.auth.AuthScreen
 import com.gmail.remember.screens.main.MainScreen
 import com.gmail.remember.screens.words.WordsScreen
 import com.gmail.remember.screens.profile.ProfileScreen
+import com.gmail.remember.screens.trainingwords.TrainingWordsScreen
 
 const val CHILD_NAME = "child_name"
+const val WORD = "word"
+const val DEEP_LINK_TRAINING = "https://remember.com/training"
 
 @Composable
 internal fun NavGraph(
@@ -48,6 +52,15 @@ internal fun NavGraph(
 
         composable(route = Screens.ProfileScreen.route) {
             ProfileScreen(navController = navController)
+        }
+
+        composable(
+            route = Screens.TrainingWordsScreen.route,
+            deepLinks = listOf(navDeepLink {
+                uriPattern = "$DEEP_LINK_TRAINING/{$WORD}"
+            })
+        ) {
+            TrainingWordsScreen(navController = navController)
         }
     }
 }

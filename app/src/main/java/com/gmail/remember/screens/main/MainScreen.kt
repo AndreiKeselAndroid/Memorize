@@ -88,7 +88,16 @@ internal fun MainScreen(
     val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
     val countColumn by remember { mutableStateOf((screenWidthDp / 200f + 0.5).toInt()) }
     val state = rememberLazyGridState()
-
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.loading_lottie)
+    )
+    val progressLottie by animateLottieCompositionAsState(
+        composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true,
+        speed = 2f,
+        restartOnPlay = true
+    )
     val emptyComposition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.empty_lottie)
     )
@@ -186,7 +195,7 @@ internal fun MainScreen(
                         .padding(8.dp),
                     containerColor = Green,
                     onClick = {
-
+                        navController.navigate(Screens.TrainingWordsScreen.route)
                     }) {
                     Icon(
                         painter = painterResource(
@@ -260,8 +269,7 @@ internal fun MainScreen(
                     )
                 }
             }
-        }
-        else if (themes?.isEmpty() == true) Box(
+        } else if (themes?.isEmpty() == true) Box(
             modifier = Modifier
                 .background(color = GraphiteBlack)
                 .padding(20.dp)
@@ -274,6 +282,20 @@ internal fun MainScreen(
                 modifier = Modifier.padding(20.dp)
             )
         }
+        else Box(
+                modifier = Modifier
+                    .background(color = GraphiteBlack)
+                    .padding(20.dp)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LottieAnimation(
+                    composition,
+                    progressLottie,
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
+
 
         if (showDialog) AlertDialog(
             modifier = Modifier.clip(shape = ShapeDefaults.Medium),
@@ -351,6 +373,20 @@ internal fun MainScreen(
             }
         }
 
-        else -> {}
+        else -> {
+            Box(
+                modifier = Modifier
+                    .background(color = GraphiteBlack)
+                    .padding(20.dp)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LottieAnimation(
+                    composition,
+                    progressLottie,
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
+        }
     }
 }

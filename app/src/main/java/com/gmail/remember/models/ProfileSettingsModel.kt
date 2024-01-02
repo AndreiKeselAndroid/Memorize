@@ -2,6 +2,8 @@ package com.gmail.remember.models
 
 import com.gmail.remember.utils.decrypt
 import com.gmail.remember.utils.encrypt
+import com.gmail.remember.utils.toDay
+import java.util.Calendar
 
 data class ProfileSettingsModel(
     val idToken: String? = "",
@@ -10,14 +12,24 @@ data class ProfileSettingsModel(
     val displayName: String? = "",
     val photoUrl: String? = "",
     val countSuccess: String = "5",
-    val timeFrom: String = "09:00",
-    val timeTo: String = "21:00",
+    val timeFrom: String = "9",
+    val timeTo: String = "21",
     val allDays: Boolean = true,
     val colorTheme: String = "system",
     val remember: Boolean = false,
     val days: HashMap<String, DayModel> = hashMapOf(),
     val theme: String = ""
 )
+
+fun ProfileSettingsModel.isShowNotification(): Boolean =
+    if (this.allDays) remember && Calendar.getInstance()
+        .get(Calendar.HOUR_OF_DAY) in this.timeFrom.toInt() until this.timeTo.toInt()
+            && theme.isNotEmpty()
+    else remember && this.days[Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
+        .toDay()]?.check == true &&
+            Calendar.getInstance()
+                .get(Calendar.HOUR_OF_DAY) in this.timeFrom.toInt()until this.timeTo.toInt()
+            && theme.isNotEmpty()
 
 fun ProfileSettingsModel.encrypt(): ProfileSettingsModel = this.copy(
     idToken = this.idToken?.encrypt(),

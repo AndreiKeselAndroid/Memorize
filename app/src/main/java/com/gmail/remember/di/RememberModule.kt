@@ -12,6 +12,8 @@ import com.gmail.remember.domain.usercases.ProfileUserCase
 import com.gmail.remember.domain.usercases.ProfileUserCaseImpl
 import com.gmail.remember.domain.usercases.MainUserCase
 import com.gmail.remember.domain.usercases.MainUserCaseImpl
+import com.gmail.remember.domain.usercases.TrainingWordsUserCase
+import com.gmail.remember.domain.usercases.TrainingWordsUserCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -44,4 +46,8 @@ internal abstract class RememberModule {
     @Binds
     @Singleton
     abstract fun bindProfileUserCase(profileUserCaseImpl: ProfileUserCaseImpl): ProfileUserCase
+
+    @Binds
+    @Singleton
+    abstract fun bindTrainingWordsUserCase(trainingWordsUserCaseImpl: TrainingWordsUserCaseImpl): TrainingWordsUserCase
 }

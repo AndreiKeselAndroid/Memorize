@@ -5,184 +5,179 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.SystemClock
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import androidx.core.app.RemoteInput
 import androidx.core.content.getSystemService
+import androidx.core.net.toUri
 import com.gmail.remember.R
 import com.gmail.remember.domain.usercases.ProfileUserCase
+import com.gmail.remember.domain.usercases.TrainingWordsUserCase
 import com.gmail.remember.models.WordModel
+import com.gmail.remember.models.isShowNotification
+import com.gmail.remember.navigation.DEEP_LINK_TRAINING
+import com.gmail.remember.screens.profile.ACTION_ANSWER
+import com.gmail.remember.screens.profile.ACTION_CANCEL_ALARM
 import com.gmail.remember.screens.profile.ACTION_START_ALARM
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 
 
 const val PUS_NOTIFICATION_CHANNEL = "REMEMBER"
 const val KEY_QUICK_REPLY_TEXT = "KEY_QUICK_REPLY_TEXT"
-const val ACTION_ANSWER = "ACTION_ANSWER"
-const val ACTION_MORE = "ACTION_MORE"
+const val NOTIFICATION_ID = 0
+const val PERIOD = 60 * 60 * 1000
 
 @AndroidEntryPoint
-class RememberBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
+class RememberBroadcastReceiver : BroadcastReceiver() {
 
     @Inject
-    lateinit var profileViewModel: ProfileUserCase
+    lateinit var profileUserCase: ProfileUserCase
+
+    @Inject
+    lateinit var trainingWordsUserCase: TrainingWordsUserCase
 
     private var notificationManager: NotificationManager? = null
-
     override fun onReceive(context: Context?, intent: Intent?) {
-        initNotificationManager(context = context)
         when (intent?.action) {
-            ACTION_START_ALARM -> prepareNotificationAndNewAlarm(
-                context = context,
-                intent = intent
-            )
+            ACTION_START_ALARM -> {
+                setNewAlarm(context = context) {
+                    initNotificationManager(context = context, isAnswer = false)
+                    if (intent.data != null)
+                        showNotification(
+                            context = context,
+                            word = Gson().fromJson(
+                                intent.data.toString(),
+                                WordModel::class.java
+                            )
+                        )
+                }
+            }
 
-            ACTION_ANSWER -> onAnswer(intent = intent, context = context)
-            ACTION_MORE -> prepareMoreNotification(context = context, intent = intent)
-        }
-    }
-
-    private fun prepareMoreNotification(
-        context: Context?,
-        intent: Intent?
-    ) {
-        launch {
-            profileViewModel.words("words").collectLatest { snapshot ->
-                val word: WordModel? = snapshot.children.mapIndexed { index, data ->
-                    data.getValue(WordModel::class.java)?.copy(id = index)
-                }[Random.nextInt(
-                    0,
-                    snapshot.children.shuffled().size.minus(1)
-                )]
-                notificationManager?.notify(
-                    intent?.data.toString().replaceBefore('/', "").trim('/').toInt(),
-                    createNewNotification(
-                        context = context,
-                        intent = intent,
-                        word = word
+            ACTION_ANSWER -> {
+                initNotificationManager(context = context, isAnswer = true)
+                if (intent.data != null) onAnswer(
+                    intent = intent,
+                    context = context,
+                    word = Gson().fromJson(
+                        intent.data.toString(),
+                        WordModel::class.java
                     )
                 )
-                coroutineContext.cancel()
             }
-        }
-    }
 
-    private fun prepareNotificationAndNewAlarm(
-        context: Context?,
-        intent: Intent?
-    ) {
-        launch {
-            profileViewModel.words("words").collectLatest { snapshot ->
-                val word: WordModel? = snapshot.children.mapIndexed { index, data ->
-                    data.getValue(WordModel::class.java)?.copy(id = index)
-                }[Random.nextInt(
-                    0,
-                    snapshot.children.shuffled().size.minus(1)
-                )]
-
-                val alarmManager: AlarmManager? = context?.getSystemService()
-                val alarmPendingIntent = PendingIntent.getBroadcast(
+            ACTION_CANCEL_ALARM -> context?.getSystemService<AlarmManager>()?.cancel(
+                PendingIntent.getBroadcast(
                     context,
-                    0,
-                    intent ?: Intent(context, RememberBroadcastReceiver::class.java).apply {
+                    NOTIFICATION_ID,
+                    Intent(context, RememberBroadcastReceiver::class.java).apply {
                         action = ACTION_START_ALARM
                     },
-                    PendingIntent.FLAG_IMMUTABLE
+                    FLAG_IMMUTABLE
                 )
-                alarmManager?.apply {
-                    setExactAndAllowWhileIdle(
-                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + 60 * 60 * 1000,
-                        alarmPendingIntent
-                    )
-                }
-
-                notificationManager?.notify(
-                    word?.id ?: -1,
-                    createNewNotification(
-                        context = context,
-                        intent = intent,
-                        word = word
-                    )
-                )
-                coroutineContext.cancel()
-            }
+            )
         }
     }
 
-    private fun onAnswer(
-        intent: Intent?,
-        context: Context?
-    ) {
-        launch {
-            val answer: String = intent?.let { intent ->
-                RemoteInput.getResultsFromIntent(intent)
-                    ?.getString(KEY_QUICK_REPLY_TEXT)
-            } ?: ""
-
-            profileViewModel.words("words").collectLatest { snapshot ->
-                val word: WordModel? = snapshot.children.mapIndexed { index, data ->
-                    data.getValue(WordModel::class.java)?.copy(id = index)
-                }[intent?.data.toString().replaceBefore('/', "").trim('/').toInt()]
-
-                notificationManager?.notify(
-                    intent?.data.toString().replaceAfter('/', "").trim('/').toInt(),
-                    createNotificationResult(
-                        word,
-                        context,
-                        intent = intent,
-                        (if (word?.wordRu?.uppercase() == answer.uppercase()) context?.getString(R.string.right) else context?.getString(
-                            R.string.wrong
-                        )) ?: ""
-                    )
-                )
-            }
-            coroutineContext.cancel()
-        }
-    }
-
-    private fun initNotificationManager(context: Context?) {
+    private fun initNotificationManager(context: Context?, isAnswer: Boolean) {
         notificationManager =
             context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (notificationManager?.getNotificationChannel(PUS_NOTIFICATION_CHANNEL) == null) {
             val channel = NotificationChannel(
                 PUS_NOTIFICATION_CHANNEL,
                 PUS_NOTIFICATION_CHANNEL,
-                NotificationManager.IMPORTANCE_DEFAULT
+                if (isAnswer) NotificationManager.IMPORTANCE_LOW else NotificationManager.IMPORTANCE_DEFAULT
             )
             notificationManager?.createNotificationChannel(channel)
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun setNewAlarm(context: Context?, result: () -> Unit) {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            profileUserCase.settingsProfile.flatMapLatest { profile ->
+                if (profile.isShowNotification())
+                    profileUserCase.words(profile.theme).map { data ->
+                        data.children.map { snapshot ->
+                            snapshot.getValue(WordModel::class.java)
+                        }.filter { word ->
+                            word?.countSuccess != profile.countSuccess.toInt()
+                        }
+                    }
+                else emptyFlow()
+            }.collectLatest { words ->
+                val word =
+                    if (words.isNotEmpty() && words.size > 1) words[Random.nextInt(
+                        0,
+                        words.size
+                    )]
+                    else if (words.size == 1) words[0] else null
+                val alarmManager: AlarmManager? = context?.getSystemService()
+                val alarmPendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    NOTIFICATION_ID,
+                    Intent(context, RememberBroadcastReceiver::class.java).apply {
+                        action = ACTION_START_ALARM
+                        data = if (word != null) Uri.parse(Gson().toJson(word)) else null
+                    },
+                    FLAG_IMMUTABLE
+                )
+                alarmManager?.apply {
+                    setExactAndAllowWhileIdle(
+                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        SystemClock.elapsedRealtime() + PERIOD,
+                        alarmPendingIntent
+                    )
+                }
+                result()
+                cancel()
+            }
+        }
+    }
+
+    private fun showNotification(
+        context: Context?,
+        word: WordModel?
+    ) {
+        notificationManager?.notify(
+            NOTIFICATION_ID,
+            createNewNotification(
+                context = context,
+                word = word
+            )
+        )
+    }
+
     private fun createNewNotification(
         context: Context?,
         word: WordModel?,
-        intent: Intent?
     ): Notification {
         val actionAnswer: NotificationCompat.Action = NotificationCompat.Action.Builder(
             null,
             context?.getString(R.string.answer),
             PendingIntent.getBroadcast(
                 context,
-                0,
+                NOTIFICATION_ID,
                 Intent(context, RememberBroadcastReceiver::class.java).apply {
                     action = ACTION_ANSWER
-                    data = Uri.parse("${intent?.data?.toString() ?: word?.id}/${word?.id}")
+                    data = Uri.parse(Gson().toJson(word))
                 },
                 PendingIntent.FLAG_MUTABLE
             )
@@ -197,58 +192,118 @@ class RememberBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
             context!!,
             PUS_NOTIFICATION_CHANNEL
         )
-            .setColor(Color.Black.toArgb())
-            .setSmallIcon(R.drawable.ic_remember)
-            .setAutoCancel(false)
-            .setVibrate(LongArray(10))
             .setContentTitle(word?.wordEng)
+            .setSmallIcon(R.drawable.ic_remember)
+            .setAutoCancel(true)
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    context,
+                    NOTIFICATION_ID,
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        "$DEEP_LINK_TRAINING/${word?.wordEng}".toUri()
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    },
+                    PendingIntent.FLAG_MUTABLE
+                )
+            )
             .addAction(actionAnswer)
             .build()
+    }
+
+    private fun onAnswer(
+        intent: Intent?,
+        word: WordModel?,
+        context: Context?
+    ) {
+
+        val result: String = intent?.let {
+            RemoteInput.getResultsFromIntent(it)
+                ?.getString(KEY_QUICK_REPLY_TEXT)
+        } ?: ""
+
+        if (word != null) {
+            CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+                if (result.uppercase().trim() == word.wordRu.uppercase().trim())
+                    trainingWordsUserCase.changeCountSuccessInWord(wordModel = word)
+                else trainingWordsUserCase.changeCountErrorInWord(wordModel = word)
+            }
+        }
+
+        notificationManager?.notify(
+            NOTIFICATION_ID,
+            createNotificationResult(
+                context = context,
+                word = word,
+                result = result
+            )
+        )
     }
 
     private fun createNotificationResult(
         word: WordModel?,
         context: Context?,
-        intent: Intent?,
         result: String
     ): Notification {
         val actionMore: NotificationCompat.Action = NotificationCompat.Action.Builder(
             null,
             context?.getString(R.string.more),
-            PendingIntent.getBroadcast(
-                context,
-                0,
-                Intent(context, RememberBroadcastReceiver::class.java).apply {
-                    action = ACTION_MORE
-                    data = Uri.parse(
-                        "${
-                            intent?.data?.toString()?.replaceBefore('/', "")?.trim('/')
-                                ?.toInt() ?: word?.id
-                        }/${word?.id}"
-                    )
-                },
+            PendingIntent.getActivity(
+                context!!,
+                NOTIFICATION_ID,
+                Intent(
+                    Intent.ACTION_VIEW,
+                    if (result.uppercase().trim() == word?.wordRu?.uppercase()
+                            ?.trim()
+                    ) "${DEEP_LINK_TRAINING}/${null}".toUri() else "$DEEP_LINK_TRAINING/${word?.wordEng ?: ""}".toUri()
+                ).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    },
                 PendingIntent.FLAG_MUTABLE
             )
         )
             .build()
         return NotificationCompat.Builder(
-            context!!,
+            context,
             PUS_NOTIFICATION_CHANNEL
         )
-            .setColor(Color.Black.toArgb())
             .setSmallIcon(R.drawable.ic_remember)
-            .setContentTitle(word?.wordEng)
+            .setAutoCancel(true)
+            .setContentTitle(
+                if (result.uppercase().trim() == word?.wordRu?.uppercase()
+                        ?.trim()
+                ) context.getString(
+                    R.string.right
+                ) else context.getString(
+                    R.string.wrong
+                )
+            )
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    context,
+                    NOTIFICATION_ID,
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        if (result.uppercase().trim() == word?.wordRu?.uppercase()
+                                ?.trim()
+                        ) "${DEEP_LINK_TRAINING}/${null}".toUri() else "$DEEP_LINK_TRAINING/${word?.wordEng ?: ""}".toUri()
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    },
+                    PendingIntent.FLAG_MUTABLE
+                )
+            )
             .setContentText(
-                context.getString(
+                if (result.uppercase().trim() == word?.wordRu?.uppercase()
+                        ?.trim()
+                ) "🍾🍾🍾🍾🍾🍾🍾🍾🍾🍾🍾🍾"
+                else context.getString(
                     R.string.correct_answer,
-                    result.uppercase(),
                     word?.wordRu?.uppercase()
                 )
             )
             .addAction(actionMore)
             .build()
     }
-
-    override val coroutineContext: CoroutineContext
-        get() = SupervisorJob() + Dispatchers.IO
 }

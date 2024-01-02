@@ -9,6 +9,7 @@ import com.gmail.remember.data.api.models.asResult
 import com.gmail.remember.domain.usercases.ProfileUserCase
 import com.gmail.remember.models.DayModel
 import com.gmail.remember.models.LevelModel
+import com.gmail.remember.models.ProfileSettingsModel
 import com.gmail.remember.models.ProgressModel
 import com.gmail.remember.models.ThemeModel
 import com.gmail.remember.models.TimeModel
@@ -37,6 +38,12 @@ internal class ProfileViewModel @Inject constructor(
     private val profileUserCase: ProfileUserCase,
 ) : ViewModel() {
 
+    val settingsProfile: StateFlow<ProfileSettingsModel> by lazy {
+        profileUserCase.settingsProfile
+            .flowOn(Dispatchers.IO)
+            .stateIn(viewModelScope, SharingStarted.Lazily, ProfileSettingsModel())
+    }
+
     private val listTimes: MutableStateFlow<List<TimeModel>> = MutableStateFlow(listTime)
 
     private val _levels: MutableStateFlow<List<LevelModel>> = MutableStateFlow(listLevels)
@@ -57,7 +64,7 @@ internal class ProfileViewModel @Inject constructor(
     val isShowAllThemes: StateFlow<Boolean> = _isShowAllThemes.asStateFlow()
 
     val checkedAllDays: StateFlow<Boolean> by lazy {
-        profileUserCase.settingsProfile.map { model ->
+        settingsProfile.map { model ->
             model.allDays.toString().toBoolean()
         }
             .flowOn(Dispatchers.IO)
@@ -65,7 +72,7 @@ internal class ProfileViewModel @Inject constructor(
     }
 
     val themes: StateFlow<List<ThemeModel>> by lazy {
-        profileUserCase.themes.combine(profileUserCase.settingsProfile) { themes, profile ->
+        profileUserCase.themes.combine(settingsProfile) { themes, profile ->
             themes.map { model ->
                 model.copy(
                     isChecked = model.name == profile.theme
@@ -117,7 +124,7 @@ internal class ProfileViewModel @Inject constructor(
                         )
                     }
                 } catch (e: Exception) {
-                   flow {emit(ProgressModel()) }
+                    flow { emit(ProgressModel()) }
                 }
             }
         }.asResult().map { result ->
@@ -133,12 +140,20 @@ internal class ProfileViewModel @Inject constructor(
 
 
     val timeFrom: StateFlow<TimeModel> by lazy {
-        profileUserCase.settingsProfile.map { profile ->
-            TimeModel(
-                id = profile.timeFrom.replaceAfter(":", "").trim(':').toInt(),
-                time = profile.timeFrom,
-                isCheck = true
-            )
+        settingsProfile.combine(listTimes) { profile, listTimes ->
+            try {
+                listTimes.first { model ->
+                    profile.timeFrom.toInt() == model.id
+                }.copy(
+                    isCheck = true
+                )
+            } catch (e: Exception) {
+                TimeModel(
+                    id = 9,
+                    time = "09:00",
+                    isCheck = true
+                )
+            }
         }
             .flowOn(Dispatchers.IO)
             .stateIn(viewModelScope, SharingStarted.Lazily, TimeModel())
@@ -146,12 +161,21 @@ internal class ProfileViewModel @Inject constructor(
 
 
     val timeTo: StateFlow<TimeModel> by lazy {
-        profileUserCase.settingsProfile.map { profile ->
-            TimeModel(
-                id = profile.timeTo.replaceAfter(":", "").trim(':').toInt(),
-                time = profile.timeTo,
-                isCheck = true
-            )
+        settingsProfile.combine(listTimes) { profile, listTimes ->
+            try {
+                listTimes.first { model ->
+                    profile.timeTo.toInt() == model.id
+                }.copy(
+                    isCheck = true
+                )
+
+            } catch (e: Exception) {
+                TimeModel(
+                    id = 21,
+                    time = "21:00",
+                    isCheck = true
+                )
+            }
         }
             .flowOn(Dispatchers.IO)
             .stateIn(viewModelScope, SharingStarted.Lazily, TimeModel())
@@ -195,7 +219,7 @@ internal class ProfileViewModel @Inject constructor(
     }
 
     val levels: StateFlow<List<LevelModel>> by lazy {
-        _levels.combine(profileUserCase.settingsProfile) { levels, profile ->
+        _levels.combine(settingsProfile) { levels, profile ->
             levels.map { model ->
                 model.copy(
                     check = model.countSuccess.toString() == profile.countSuccess
@@ -207,7 +231,7 @@ internal class ProfileViewModel @Inject constructor(
     }
 
     val level: StateFlow<LevelModel> by lazy {
-        profileUserCase.settingsProfile.combine(_levels) { profile, listLevels ->
+        settingsProfile.combine(_levels) { profile, listLevels ->
             try {
                 listLevels.first { model ->
                     model.countSuccess.toString() == profile.countSuccess
@@ -222,7 +246,7 @@ internal class ProfileViewModel @Inject constructor(
 
 
     val isRemember: StateFlow<Boolean> by lazy {
-        profileUserCase.settingsProfile.map { model ->
+        settingsProfile.map { model ->
             model.remember.toString().toBoolean()
         }
             .flowOn(Dispatchers.IO)
@@ -230,7 +254,7 @@ internal class ProfileViewModel @Inject constructor(
     }
 
     val days: StateFlow<List<DayModel>> by lazy {
-        profileUserCase.settingsProfile.map { profile ->
+        settingsProfile.map { profile ->
             profile.days.values.sortedBy { model ->
                 model.id
             }.toList()

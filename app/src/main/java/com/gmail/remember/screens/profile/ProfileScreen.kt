@@ -1,6 +1,7 @@
 package com.gmail.remember.screens.profile
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -65,6 +66,7 @@ import com.gmail.remember.models.LevelModel
 import com.gmail.remember.models.ProgressModel
 import com.gmail.remember.models.TimeModel
 import com.gmail.remember.models.isShowProgress
+import com.gmail.remember.receiver.RememberBroadcastReceiver
 import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
@@ -72,6 +74,8 @@ import com.gmail.remember.ui.theme.Green
 import java.util.Locale
 
 const val ACTION_START_ALARM = "ACTION_START_ALARM"
+const val ACTION_CANCEL_ALARM = "ACTION_CANCEL_ALARM"
+const val ACTION_ANSWER = "ACTION_ANSWER"
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,6 +101,7 @@ internal fun ProfileScreen(
     val expandLevels by viewModel.expandLevels.collectAsState()
     val progress by viewModel.progress.collectAsState()
     val stateUi by viewModel.stateUi.collectAsState()
+    val settingsProfile by viewModel.settingsProfile.collectAsState()
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val composition by rememberLottieComposition(
@@ -333,30 +338,39 @@ internal fun ProfileScreen(
                     text = R.string.on_notifications,
                     onCheckedChange = { value ->
                         viewModel.onCheckedChangeRemember(value) {
-//                        val alarmPendingIntent = PendingIntent.getBroadcast(
-//                            context,
-//                            0,
-//                            Intent(context, RememberBroadcastReceiver::class.java).apply {
-//                                action = ACTION_START_ALARM
-//                            },
-//                            FLAG_IMMUTABLE
-//                        )
-//                        if (value) {
-//                            context.getSystemService<AlarmManager>()?.apply {
-//                                setExactAndAllowWhileIdle(
-//                                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
-//                                    SystemClock.elapsedRealtime() + 10 * 1000,
-//                                    alarmPendingIntent
-//                                )
-//                            }
-//                        } else {
-//                            context.getSystemService<AlarmManager>()?.apply {
-//                                cancel(alarmPendingIntent)
-//                            }
-//                        }
+                            if (value) context.sendBroadcast(
+                                    Intent(
+                                        context,
+                                        RememberBroadcastReceiver::class.java
+                                    ).apply {
+                                        action = ACTION_START_ALARM
+                                    })
+                            else context.sendBroadcast(
+                                    Intent(
+                                        context,
+                                        RememberBroadcastReceiver::class.java
+                                    ).apply {
+                                        action = ACTION_CANCEL_ALARM
+                                    })
                         }
                     }
                 )
+
+                if (isRemember && settingsProfile.theme.isEmpty())
+                    Text(
+                        modifier = Modifier
+                            .padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                bottom = 12.dp
+                            ),
+                        text = stringResource(R.string.chose_theme),
+                        fontWeight = FontWeight.Light,
+                        textAlign = TextAlign.Start,
+                        fontSize = 12.sp,
+                        lineHeight = 24.sp,
+                        color = Color.Yellow
+                    )
 
                 if (isRemember) Divider(
                     modifier = Modifier.padding(bottom = 12.dp),
@@ -486,7 +500,7 @@ internal fun ProfileScreen(
                                 enabled = false,
                                 expandTime = mutableStateOf(expandTimeFrom),
                                 onClickItemMenu = { time ->
-                                    viewModel.setTimeFrom(time = (time as? TimeModel)?.time ?: "")
+                                    viewModel.setTimeFrom(time = (time as? TimeModel)?.id.toString())
                                     viewModel.hideTimeFrom()
                                 },
                                 trailingIcon = {
@@ -523,7 +537,7 @@ internal fun ProfileScreen(
                                 enabled = false,
                                 expandTime = mutableStateOf(expandTimeTo),
                                 onClickItemMenu = { time ->
-                                    viewModel.setTimeTo(time = (time as? TimeModel)?.time ?: "")
+                                    viewModel.setTimeTo(time = (time as? TimeModel)?.id.toString())
                                     viewModel.hideTimeTo()
                                 },
                                 trailingIcon = {

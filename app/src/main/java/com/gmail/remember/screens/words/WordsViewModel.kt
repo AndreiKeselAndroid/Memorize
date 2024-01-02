@@ -57,7 +57,7 @@ internal class WordsViewModel @Inject constructor(
             rememberUserCase.words(name).combine(_selectedWords.asStateFlow()) { snapshots, words ->
                 snapshots.children.map { snapshot ->
                     if (words.contains(snapshot.getValue(WordModel::class.java)))
-                        snapshot.getValue(WordModel::class.java)?.copy(isCheck = true)
+                        snapshot.getValue(WordModel::class.java)?.copy(check = true)
                     else snapshot.getValue(WordModel::class.java)
                 }
             }
@@ -94,7 +94,7 @@ internal class WordsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _selectedWords.update { words ->
                 words.toMutableList().apply {
-                    if (word.isCheck) {
+                    if (word.check) {
                         clear()
                         addAll(words.filter { model -> model?.wordEng != word.wordEng })
                     } else add(word)
@@ -116,7 +116,7 @@ internal class WordsViewModel @Inject constructor(
     private fun selectAllWords(allWords: List<WordModel?>) {
         _selectedWords.update { words ->
             words.toMutableList().apply {
-                addAll(allWords.filter { model -> model?.isCheck == false })
+                addAll(allWords.filter { model -> model?.check == false })
             }.toList()
         }
     }

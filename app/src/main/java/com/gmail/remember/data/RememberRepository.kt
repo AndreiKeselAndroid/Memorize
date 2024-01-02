@@ -46,4 +46,6 @@ interface RememberRepository {
     suspend fun setTimeTo(time: String)
     suspend fun setCount(count: String)
     suspend fun changeCountInWords(count: String)
+    suspend fun changeCountSuccessInWord(wordModel: WordModel)
+    suspend fun changeCountErrorInWord(wordModel: WordModel)
 }
