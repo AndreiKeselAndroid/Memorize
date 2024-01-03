@@ -1,5 +1,6 @@
 package com.gmail.remember.screens.trainingwords
 
+import android.os.CountDownTimer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,6 +30,23 @@ internal class TrainingWordsViewModel @Inject constructor(
     private val trainingWordsUserCase: TrainingWordsUserCase,
     private val profileUserCase: ProfileUserCase
 ) : ViewModel() {
+
+    private val _isPlayingFireWork: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isPlayingFireWork: StateFlow<Boolean> = _isPlayingFireWork.asStateFlow()
+
+    private val timer: CountDownTimer = object : CountDownTimer(1500L, 1500) {
+        override fun onTick(p0: Long) {
+            viewModelScope.launch {
+                _isPlayingFireWork.emit(true)
+            }
+        }
+
+        override fun onFinish() {
+            viewModelScope.launch {
+                _isPlayingFireWork.emit(false)
+            }
+        }
+    }
 
     private val _answer: MutableStateFlow<String> = MutableStateFlow("")
     val answer: StateFlow<String> = _answer.asStateFlow()
@@ -82,17 +100,18 @@ internal class TrainingWordsViewModel @Inject constructor(
         }
     }
 
-    fun onCheckAnswer(word: WordModel, answer: String, errorMessage: String) {
+    fun onCheckAnswer(word: WordModel, answer: String) {
         viewModelScope.launch {
             if (word.wordRu.isNotEmpty() && answer.isNotEmpty()) {
                 if (word.wordRu.uppercase() == answer.uppercase()) {
                     savedStateHandle[WORD] = ""
                     trainingWordsUserCase.changeCountSuccessInWord(wordModel = word)
                     setAnswer("")
-                    setErrorMessage(message = "")
+                    setErrorMessage(message = "🤗🤗🤗🤗 Верно!!! 👍👍👍🙋")
+                    timer.start()
                 } else {
                     _error.emit(true)
-                    setErrorMessage(message = errorMessage)
+                    setErrorMessage(message = "☹️☹️Неверно️!!!👎🤦 Правильный ответ: ${word.wordRu.uppercase()}")
                     savedStateHandle[WORD] = ""
                     trainingWordsUserCase.changeCountErrorInWord(wordModel = word)
                     setAnswer("")

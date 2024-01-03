@@ -43,7 +43,7 @@ import kotlin.random.Random
 const val PUS_NOTIFICATION_CHANNEL = "REMEMBER"
 const val KEY_QUICK_REPLY_TEXT = "KEY_QUICK_REPLY_TEXT"
 const val NOTIFICATION_ID = 0
-const val PERIOD = 60 * 60 * 1000
+const val MILLS = 60 * 1000
 
 @AndroidEntryPoint
 class RememberBroadcastReceiver : BroadcastReceiver() {
@@ -123,31 +123,33 @@ class RememberBroadcastReceiver : BroadcastReceiver() {
                     }
                 else emptyFlow()
             }.collectLatest { words ->
-                val word =
-                    if (words.isNotEmpty() && words.size > 1) words[Random.nextInt(
-                        0,
-                        words.size
-                    )]
-                    else if (words.size == 1) words[0] else null
-                val alarmManager: AlarmManager? = context?.getSystemService()
-                val alarmPendingIntent = PendingIntent.getBroadcast(
-                    context,
-                    NOTIFICATION_ID,
-                    Intent(context, RememberBroadcastReceiver::class.java).apply {
-                        action = ACTION_START_ALARM
-                        data = if (word != null) Uri.parse(Gson().toJson(word)) else null
-                    },
-                    FLAG_IMMUTABLE
-                )
-                alarmManager?.apply {
-                    setExactAndAllowWhileIdle(
-                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + PERIOD,
-                        alarmPendingIntent
+                profileUserCase.period.collectLatest { period ->
+                    val word =
+                        if (words.isNotEmpty() && words.size > 1) words[Random.nextInt(
+                            0,
+                            words.size
+                        )]
+                        else if (words.size == 1) words[0] else null
+                    val alarmManager: AlarmManager? = context?.getSystemService()
+                    val alarmPendingIntent = PendingIntent.getBroadcast(
+                        context,
+                        NOTIFICATION_ID,
+                        Intent(context, RememberBroadcastReceiver::class.java).apply {
+                            action = ACTION_START_ALARM
+                            data = if (word != null) Uri.parse(Gson().toJson(word)) else null
+                        },
+                        FLAG_IMMUTABLE
                     )
+                    alarmManager?.apply {
+                        setExactAndAllowWhileIdle(
+                            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                            SystemClock.elapsedRealtime() + period * MILLS,
+                            alarmPendingIntent
+                        )
+                    }
+                    result()
+                    cancel()
                 }
-                result()
-                cancel()
             }
         }
     }
@@ -192,6 +194,7 @@ class RememberBroadcastReceiver : BroadcastReceiver() {
             context!!,
             PUS_NOTIFICATION_CHANNEL
         )
+            .setSilent(false)
             .setContentTitle(word?.wordEng)
             .setSmallIcon(R.drawable.ic_remember)
             .setAutoCancel(true)
@@ -258,8 +261,8 @@ class RememberBroadcastReceiver : BroadcastReceiver() {
                             ?.trim()
                     ) "${DEEP_LINK_TRAINING}/${null}".toUri() else "$DEEP_LINK_TRAINING/${word?.wordEng ?: ""}".toUri()
                 ).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    },
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                },
                 PendingIntent.FLAG_MUTABLE
             )
         )
@@ -268,6 +271,7 @@ class RememberBroadcastReceiver : BroadcastReceiver() {
             context,
             PUS_NOTIFICATION_CHANNEL
         )
+            .setSilent(true)
             .setSmallIcon(R.drawable.ic_remember)
             .setAutoCancel(true)
             .setContentTitle(

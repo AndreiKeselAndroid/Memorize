@@ -44,6 +44,9 @@ import javax.inject.Inject
 
 private const val THEMES = "themes"
 private const val PROFILE = "profile"
+private const val USERS = "users"
+private const val SETTINGS = "settings"
+private const val PERIOD = "period"
 private const val COUNT_SUCCESS = "countSuccess"
 private const val COUNT_ERROR = "countError"
 private const val ALL_DAYS = "allDays"
@@ -60,7 +63,8 @@ internal class RememberRepositoryImpl @Inject constructor(
 
     private val dataBase = Firebase.database
     override val settingsProfile: Flow<ProfileSettingsModel>
-        get() = dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        get() = dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE).snapshots.map { data ->
                 data.getValue(ProfileSettingsModel::class.java)?.decrypt()
                     ?: ProfileSettingsModel().decrypt()
@@ -71,10 +75,12 @@ internal class RememberRepositoryImpl @Inject constructor(
     override val firebaseAuth: FirebaseAuth
         get() = Firebase.auth
     override val themes: Flow<List<ThemeModel>>
-        get() = dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        get() = dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(THEMES)
             .snapshots.combine(
-                dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+                dataBase.getReference(USERS)
+                    .child(firebaseAuth.currentUser?.uid ?: "")
                     .child(PROFILE)
                     .child(COUNT_SUCCESS)
                     .snapshots
@@ -84,6 +90,11 @@ internal class RememberRepositoryImpl @Inject constructor(
                 }
             }
             .flowOn(Dispatchers.IO)
+    override val period: Flow<Int>
+        get() =  dataBase.getReference(SETTINGS)
+            .child(PERIOD).snapshots.map {data->
+                data.value.toString().toInt()
+            }
 
     override suspend fun signIn(activity: ComponentActivity, launch: (GoogleSignInClient) -> Unit) {
         launch(
@@ -106,7 +117,8 @@ internal class RememberRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveProfile(profileModel: ProfileSettingsModel) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .setValue(profileModel.encrypt())
     }
@@ -120,7 +132,8 @@ internal class RememberRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addWord(model: WordModel, childName: String): Task<Void> =
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(THEMES)
             .child(childName)
             .child(model.wordEng)
@@ -129,7 +142,8 @@ internal class RememberRepositoryImpl @Inject constructor(
 
     override suspend fun deleteWords(models: List<WordModel?>, childName: String) {
         models.forEach { model ->
-            dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+            dataBase.getReference(USERS)
+                .child(firebaseAuth.currentUser?.uid ?: "")
                 .child(THEMES)
                 .child(childName)
                 .child(model?.wordEng ?: "")
@@ -138,42 +152,48 @@ internal class RememberRepositoryImpl @Inject constructor(
     }
 
     override fun words(childName: String): Flow<DataSnapshot> =
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(THEMES)
             .child(childName)
             .snapshots
             .flowOn(Dispatchers.IO)
 
     override suspend fun addSection(name: String) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(THEMES)
             .child(name)
             .setValue(name)
     }
 
     override suspend fun deleteSection(name: String) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(THEMES)
             .child(name)
             .removeValue()
     }
 
     override suspend fun onCheckedChangeAllDays(value: Boolean) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .child(ALL_DAYS)
             .setValue(value)
     }
 
     override suspend fun onCheckedChangeRemember(value: Boolean) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .child(IS_REMEMBER)
             .setValue(value)
     }
 
     override suspend fun checkDay(name: String) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .child(DAYS)
             .child(name)
@@ -182,7 +202,8 @@ internal class RememberRepositoryImpl @Inject constructor(
     }
 
     override suspend fun unCheckDay(name: String) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .child(DAYS)
             .child(name)
@@ -191,7 +212,8 @@ internal class RememberRepositoryImpl @Inject constructor(
     }
 
     override suspend fun unCheckAllDays() {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .child(DAYS)
             .setValue(
@@ -236,7 +258,8 @@ internal class RememberRepositoryImpl @Inject constructor(
     }
 
     override suspend fun checkAllDays() {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .child(DAYS)
             .setValue(
@@ -269,35 +292,40 @@ internal class RememberRepositoryImpl @Inject constructor(
     }
 
     override suspend fun checkTheme(name: String) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .child(THEME)
             .setValue(name.encrypt())
     }
 
     override suspend fun setTimeFrom(time: String) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .child(TIME_FROM)
             .setValue(time.encrypt())
     }
 
     override suspend fun setTimeTo(time: String) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .child(TIME_TO)
             .setValue(time.encrypt())
     }
 
     override suspend fun setCount(count: String) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .child(COUNT_SUCCESS)
             .setValue(count.encrypt())
     }
 
     override suspend fun changeCountInWords(count: String) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(THEMES)
             .snapshots
             .map { snapshots ->
@@ -312,7 +340,8 @@ internal class RememberRepositoryImpl @Inject constructor(
                 result.forEach { map ->
                     map.forEach { entry ->
                         if (entry.key != null && entry.value != null && entry.value!!.countSuccess > count.toInt()) {
-                            dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+                            dataBase.getReference(USERS)
+                                .child(firebaseAuth.currentUser?.uid ?: "")
                                 .child(THEMES)
                                 .child(entry.key!!)
                                 .child(entry.value!!.wordEng)
@@ -325,7 +354,8 @@ internal class RememberRepositoryImpl @Inject constructor(
     }
 
     override suspend fun changeCountSuccessInWord(wordModel: WordModel) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(THEMES)
             .child(wordModel.theme)
             .child(wordModel.wordEng)
@@ -334,7 +364,8 @@ internal class RememberRepositoryImpl @Inject constructor(
     }
 
     override suspend fun changeCountErrorInWord(wordModel: WordModel) {
-        dataBase.getReference(firebaseAuth.currentUser?.uid ?: "")
+        dataBase.getReference(USERS)
+            .child(firebaseAuth.currentUser?.uid ?: "")
             .child(THEMES)
             .child(wordModel.theme)
             .child(wordModel.wordEng)

@@ -13,6 +13,9 @@ internal class ProfileUserCaseImpl @Inject constructor(
     override val settingsProfile: Flow<ProfileSettingsModel>
         get() = rememberRepository.settingsProfile
 
+    override val period: Flow<Int>
+        get() = rememberRepository.period
+
     override val themes: Flow<List<ThemeModel>>
         get() = rememberRepository.themes
 

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Запоминалка</string>
     <string name="words">Слова</string>
-    <string name="title_ok">Понятно</string>
+    <string name="title_ok">🤦 Понятно️</string>
     <string name="themes">Темы</string>
     <string name="time">Время</string>
     <string name="level">Уровень сложности</string>
@@ -31,6 +31,5 @@
     <string name="answer_error">Неправильных ответов: %1$s</string>
     <string name="active_theme">Прогресс по теме: \"%1$s\"</string>
     <string name="title_training">Тренировка</string>
-    <string name="error_message">Неверно!!! Правильный ответ: %1$s</string>
     <string name="chose_new_theme">Выберите другую тему или добавте слова!</string>
 </resources>

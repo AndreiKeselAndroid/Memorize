@@ -10,6 +10,8 @@ interface ProfileUserCase {
     val themes: Flow<List<ThemeModel>>
 
     val settingsProfile: Flow<ProfileSettingsModel>
+
+    val period: Flow<Int>
     fun words(childName: String): Flow<DataSnapshot>
     suspend fun onCheckedChangeAllDays(value: Boolean)
     suspend fun onCheckedChangeRemember(value: Boolean)

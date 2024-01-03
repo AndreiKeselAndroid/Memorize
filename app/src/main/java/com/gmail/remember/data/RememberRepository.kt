@@ -20,6 +20,8 @@ interface RememberRepository {
 
     val themes: Flow<List<ThemeModel>>
 
+    val period: Flow<Int>
+
     fun words(childName: String): Flow<DataSnapshot>
 
     suspend fun signIn(activity: ComponentActivity, launch: (GoogleSignInClient) -> Unit)

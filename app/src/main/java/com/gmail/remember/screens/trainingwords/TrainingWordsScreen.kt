@@ -1,5 +1,6 @@
 package com.gmail.remember.screens.trainingwords
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,6 +56,7 @@ import com.gmail.remember.ui.theme.BlackBrown
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 internal fun TrainingWordsScreen(
@@ -65,14 +67,8 @@ internal fun TrainingWordsScreen(
     val wordModel by viewModel.wordModel.collectAsState()
     val answer by viewModel.answer.collectAsState()
     val error by viewModel.error.collectAsState()
+    val isPlayingFireWork by viewModel.isPlayingFireWork.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
-    val message = if (!error &&
-        wordModelDeepLink?.wordEng.isNullOrEmpty() &&
-        wordModel?.wordEng.isNullOrEmpty()
-    ) stringResource(R.string.chose_new_theme) else stringResource(
-        id = R.string.error_message,
-        wordModelDeepLink?.wordRu ?: wordModel?.wordRu ?: ""
-    )
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -82,6 +78,17 @@ internal fun TrainingWordsScreen(
     )
     val lottie by animateLottieCompositionAsState(
         composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true,
+        speed = 1f,
+        restartOnPlay = false
+    )
+
+    val compositionFireWork by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.firework)
+    )
+    val lottieFireWork by animateLottieCompositionAsState(
+        compositionFireWork,
         iterations = LottieConstants.IterateForever,
         isPlaying = true,
         speed = 1f,
@@ -156,8 +163,7 @@ internal fun TrainingWordsScreen(
                 keyboardActions = { value ->
                     viewModel.onCheckAnswer(
                         word = wordModelDeepLink ?: wordModel ?: WordModel(),
-                        answer = value,
-                        errorMessage = message
+                        answer = value
                     )
                 },
                 onValueChange = { value -> viewModel.setAnswer(value = value) },
@@ -221,13 +227,17 @@ internal fun TrainingWordsScreen(
                     ),
                     colors = CardDefaults.cardColors(
                         containerColor = GrayishOrange,
-                        contentColor = if (error) Color.Red else GraphiteBlack
+                        contentColor = GraphiteBlack
                     )
                 ) {
                     Text(
                         modifier = Modifier
                             .padding(16.dp),
-                        text = if (!error) wordModelDeepLink?.wordEng ?: wordModel?.wordEng ?: ""
+                        text = if (!error) {
+                            if (isPlayingFireWork) stringResource(id = R.string.right) else
+                            wordModelDeepLink?.wordEng ?: wordModel?.wordEng
+                            ?: ""
+                        }
                         else errorMessage
                     )
                 }
@@ -248,10 +258,27 @@ internal fun TrainingWordsScreen(
                     Text(
                         modifier = Modifier
                             .padding(16.dp),
-                        text = message
+                        text = if (!error &&
+                            wordModelDeepLink?.wordEng.isNullOrEmpty() &&
+                            wordModel?.wordEng.isNullOrEmpty()
+                        ) stringResource(R.string.chose_new_theme) else errorMessage
                     )
                 }
             }
+        }
+    }
+
+    if (isPlayingFireWork) {
+        Box(
+            modifier = Modifier
+                .background(Color.Transparent)
+                .fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            LottieAnimation(
+                composition = compositionFireWork,
+                progress = lottieFireWork,
+            )
         }
     }
 }

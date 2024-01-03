@@ -43,7 +43,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -66,9 +65,9 @@ import com.gmail.remember.models.ThemeModel
 import com.gmail.remember.navigation.Screens
 import com.gmail.remember.navigation.navigateSafeArgs
 import com.gmail.remember.ui.theme.BlackBrown
+import com.gmail.remember.ui.theme.Blue
 import com.gmail.remember.ui.theme.GraphiteBlack
 import com.gmail.remember.ui.theme.GrayishOrange
-import com.gmail.remember.ui.theme.Green
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,6 +87,16 @@ internal fun MainScreen(
     val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
     val countColumn by remember { mutableStateOf((screenWidthDp / 200f + 0.5).toInt()) }
     val state = rememberLazyGridState()
+    val compositionDumbbells by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.dumbbells)
+    )
+    val progressLottieDumbbells  by animateLottieCompositionAsState(
+        compositionDumbbells,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true,
+        speed = 2f,
+        restartOnPlay = true
+    )
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.loading_lottie)
     )
@@ -191,21 +200,17 @@ internal fun MainScreen(
             ) {
                 FloatingActionButton(
                     modifier = Modifier
-                        .size(56.dp)
-                        .padding(8.dp),
-                    containerColor = Green,
+                        .padding(8.dp)
+                        .size(56.dp),
+                    containerColor = Blue,
                     onClick = {
                         navController.navigate(Screens.TrainingWordsScreen.route)
                     }) {
-                    Icon(
-                        painter = painterResource(
-                            id = R.drawable.ic_check
-                        ),
-                        tint = BlackBrown,
-                        contentDescription = "Test"
+                    LottieAnimation(
+                        compositionDumbbells,
+                        progressLottieDumbbells
                     )
                 }
-
                 FloatingActionButton(
                     containerColor = GrayishOrange,
                     onClick = {
