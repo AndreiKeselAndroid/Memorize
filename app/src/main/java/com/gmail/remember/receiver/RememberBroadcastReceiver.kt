@@ -32,8 +32,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -121,7 +121,7 @@ class RememberBroadcastReceiver : BroadcastReceiver() {
                             word?.countSuccess != profile.countSuccess.toInt()
                         }
                     }
-                else emptyFlow()
+                else flow { emit(emptyList<WordModel>()) }
             }.collectLatest { words ->
                 profileUserCase.period.collectLatest { period ->
                     val word =
@@ -147,7 +147,9 @@ class RememberBroadcastReceiver : BroadcastReceiver() {
                             alarmPendingIntent
                         )
                     }
-                    result()
+
+                    if (words.isNotEmpty()) result()
+
                     cancel()
                 }
             }
