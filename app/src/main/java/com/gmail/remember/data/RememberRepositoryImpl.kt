@@ -296,7 +296,7 @@ internal class RememberRepositoryImpl @Inject constructor(
             .child(firebaseAuth.currentUser?.uid ?: "")
             .child(PROFILE)
             .child(THEME)
-            .setValue(name.encrypt())
+            .setValue(name)
     }
 
     override suspend fun setTimeFrom(time: String) {
