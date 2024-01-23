@@ -35,24 +35,24 @@ fun ProfileSettingsModel.encrypt(): ProfileSettingsModel = this.copy(
     idToken = this.idToken?.encrypt(),
     familyName = this.familyName?.encrypt(),
     givenName = this.givenName?.encrypt(),
-    displayName = this.displayName?.encrypt(),
+    displayName = this.displayName,
     photoUrl = this.photoUrl?.encrypt(),
     countSuccess = this.countSuccess.encrypt(),
     timeFrom = this.timeFrom.encrypt(),
     timeTo = this.timeTo.encrypt(),
     colorTheme = this.colorTheme.encrypt(),
-    theme = this.theme.encrypt()
+    theme = this.theme
 )
 
 fun ProfileSettingsModel.decrypt(): ProfileSettingsModel = this.copy(
     idToken = this.idToken?.decrypt(),
     familyName = this.familyName?.decrypt(),
     givenName = this.givenName?.decrypt(),
-    displayName = this.displayName?.decrypt(),
+    displayName = this.displayName,
     photoUrl = this.photoUrl?.decrypt(),
     countSuccess = this.countSuccess.decrypt(),
     timeFrom = this.timeFrom.decrypt(),
     timeTo = this.timeTo.decrypt(),
     colorTheme = this.colorTheme.decrypt(),
-    theme = this.theme.decrypt()
+    theme = this.theme
 )
