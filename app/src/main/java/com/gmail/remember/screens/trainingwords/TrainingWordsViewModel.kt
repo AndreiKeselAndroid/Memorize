@@ -87,7 +87,7 @@ internal class TrainingWordsViewModel @Inject constructor(
                     0,
                     words.size
                 )]
-                else if (words.size == 1) words[0] else null
+                else if (words.size == 1) words[0] else WordModel()
             }
         }
             .flowOn(Dispatchers.IO)

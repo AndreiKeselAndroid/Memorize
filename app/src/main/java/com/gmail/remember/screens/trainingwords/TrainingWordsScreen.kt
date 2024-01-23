@@ -235,13 +235,14 @@ internal fun TrainingWordsScreen(
                             .padding(16.dp),
                         text = if (!error) {
                             if (isPlayingFireWork) stringResource(id = R.string.right) else
-                            wordModelDeepLink?.wordEng ?: wordModel?.wordEng
-                            ?: ""
-                        }
-                        else errorMessage
+                                wordModelDeepLink?.wordEng ?: wordModel?.wordEng
+                                ?: ""
+                        } else errorMessage
                     )
                 }
-                else Card(
+                else if (wordModelDeepLink != null ||
+                    wordModel != null
+                ) Card(
                     modifier = Modifier
                         .padding(end = 8.dp, top = 30.dp),
                     shape = RoundedCornerShape(
